@@ -9,6 +9,8 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -64,81 +66,117 @@ public class AppWindow extends ApplicationWindow {
 
     private void createSash(Composite c) {
 
-	SashForm form = new SashForm(c, SWT.BORDER | SWT.HORIZONTAL);
+	SashForm form = new SashForm(c, SWT.BORDER);
 	form.setLayout(new FillLayout());
 	form.SASH_WIDTH = 1;
 
 	// Start create Left part
-	Composite child1 = new Composite(form, SWT.V_SCROLL | SWT.H_SCROLL);
+	Composite child1 = new Composite(form, SWT.BORDER);
 	child1.setLayout(new FillLayout());
 
 	TableViewer viewer = new TableViewer(child1, SWT.BORDER | SWT.FULL_SELECTION);
 
 	// Start create right part
-	Composite child2 = new Composite(form, SWT.NONE);
-	GridLayout gridLayout1 = new GridLayout(2, true);
+	Composite child2 = new Composite(form, SWT.BORDER);
+	// GridLayout grid2 = new GridLayout(1, false);
+	// grid2.marginHeight = 5;
+	// grid2.marginWidth = 3;
+
+	child2.setLayout(new FillLayout(SWT.VERTICAL));
+
+	Composite child21 = new Composite(child2, SWT.BORDER);
+
+	GridLayout gridLayout1 = new GridLayout();
+	gridLayout1.numColumns = 4;
 	gridLayout1.horizontalSpacing = 5;
-	gridLayout1.marginRight = 25;
-	gridLayout1.marginLeft = 25;
+	gridLayout1.makeColumnsEqualWidth = true;
 
-	child2.setLayout(gridLayout1);
+	child21.setLayout(gridLayout1);
 
-	GridData gridData1 = new GridData(100, 25);
-	gridData1.grabExcessHorizontalSpace = true;
+	GridData child21GridData = new GridData(SWT.FILL, SWT.BOTTOM, true, false);
+	child21.setLayoutData(child21GridData);
 
-	Label labelName = new Label(child2, SWT.BORDER);
+	GridData gridDataLabels = new GridData(100, 25);
+	gridDataLabels.grabExcessHorizontalSpace = true;
+	gridDataLabels.horizontalAlignment = SWT.LEFT;
+
+	GridData gridDataText = new GridData(200, 25);
+	gridDataText.grabExcessHorizontalSpace = true;
+	gridDataText.horizontalAlignment = SWT.LEFT;
+	gridDataText.horizontalSpan = 3;
+
+	Label labelName = new Label(child21, SWT.BORDER);
 	labelName.setText("Name");
-	labelName.setLayoutData(gridData1);
+	labelName.setLayoutData(gridDataLabels);
 
-	Text textName = new Text(child2, SWT.BORDER);
-	textName.setLayoutData(gridData1);
+	Text textName = new Text(child21, SWT.BORDER);
+	textName.setLayoutData(gridDataText);
 
-	Label labelGroup = new Label(child2, SWT.BORDER);
+	Label labelGroup = new Label(child21, SWT.BORDER);
 	labelGroup.setText("Group");
-	labelGroup.setLayoutData(gridData1);
+	labelGroup.setLayoutData(gridDataLabels);
 
-	Text textGroup = new Text(child2, SWT.BORDER);
-	textGroup.setLayoutData(gridData1);
+	Text textGroup = new Text(child21, SWT.BORDER);
+	textGroup.setLayoutData(gridDataText);
 
-	Label labelSWTDone = new Label(child2, SWT.BORDER);
+	Label labelSWTDone = new Label(child21, SWT.BORDER);
 	labelSWTDone.setText("SWT task is done?");
-	labelGroup.setLayoutData(gridData1);
+	labelGroup.setLayoutData(gridDataLabels);
 
-	Button buttonSWTDone = new Button(child2, SWT.CHECK);
+	Button buttonSWTDone = new Button(child21, SWT.CHECK);
 	buttonSWTDone.setSelection(false);
-	buttonSWTDone.setLayoutData(gridData1);
+	buttonSWTDone.setLayoutData(gridDataText);
 
-	GridLayout gridLayout2 = new GridLayout(4, false);
+	GridLayout gridLayout2 = new GridLayout(4, true);
 	gridLayout2.horizontalSpacing = 10;
 	gridLayout2.verticalSpacing = 20;
-	gridLayout2.marginWidth = 10;
-	gridLayout2.marginTop = 50;
-
-	Composite child3 = new Composite(child2, SWT.NONE);
-	child3.setLayout(gridLayout2);
+	gridLayout2.marginTop = 150;
+	gridLayout2.marginBottom = 20;
+	gridLayout2.marginLeft = 10;
+	gridLayout2.marginRight = 10;
 
 	GridData buttonGridData = new GridData(SWT.FILL, SWT.BOTTOM, true, true, 1, 1);
-	buttonGridData.widthHint = 60;
+	buttonGridData.widthHint = 70;
 	buttonGridData.heightHint = 30;
-	buttonGridData.grabExcessHorizontalSpace = true;
 
-	Button buttonNew = new Button(child3, SWT.PUSH);
-	buttonNew.setLayoutData(buttonGridData);
+	// buttonGridData.grabExcessHorizontalSpace = true;
+
+	RowLayout rowLayout22 = new RowLayout();
+	rowLayout22.pack = true;
+	rowLayout22.wrap = false;
+	rowLayout22.justify = false;
+	rowLayout22.fill = true;
+	rowLayout22.marginBottom = 10;
+	rowLayout22.marginTop = 70;
+
+	RowData rData = new RowData(70, 30);
+
+	FillLayout fillLayout = new FillLayout();
+	fillLayout.type = SWT.HORIZONTAL;
+	fillLayout.marginWidth = 10;
+	fillLayout.spacing = 5;
+	fillLayout.marginHeight = 100;
+
+	Composite child22 = new Composite(child2, SWT.BORDER);
+	child22.setLayout(rowLayout22);
+
+	Button buttonNew = new Button(child22, SWT.PUSH);
+	buttonNew.setLayoutData(rData);
 	buttonNew.setText("New");
 
-	Button buttonSave = new Button(child3, SWT.PUSH);
-	buttonSave.setLayoutData(buttonGridData);
+	Button buttonSave = new Button(child22, SWT.PUSH);
+	buttonSave.setLayoutData(rData);
 	buttonSave.setText("Save");
 
-	Button buttonDelete = new Button(child3, SWT.PUSH);
-	buttonDelete.setLayoutData(buttonGridData);
+	Button buttonDelete = new Button(child22, SWT.PUSH);
+	buttonDelete.setLayoutData(rData);
 	buttonDelete.setText("Delete");
 
-	Button buttonCancel = new Button(child3, SWT.PUSH);
-	buttonCancel.setLayoutData(buttonGridData);
+	Button buttonCancel = new Button(child22, SWT.PUSH);
+	buttonCancel.setLayoutData(rData);
 	buttonCancel.setText("Cancel");
 
-	form.setWeights(new int[] { 50, 50 });
+	form.setWeights(new int[] { 70, 50 });
     }
 
     private void createMenu(Composite c) {
