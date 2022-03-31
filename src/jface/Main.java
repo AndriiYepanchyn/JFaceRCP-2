@@ -1,10 +1,12 @@
 package jface;
 
+import org.eclipse.swt.widgets.Display;
+
 public class Main {
-
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-      Appication.s
-	}
-
+    public static void main(String[] args) {
+	AppWindow win = new AppWindow();
+	win.setBlockOnOpen(true);
+	win.open();
+	Display.getCurrent().dispose();
+    }
 }
