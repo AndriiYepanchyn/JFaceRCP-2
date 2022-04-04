@@ -1,4 +1,4 @@
-package jface;
+package toRemove;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;

@@ -3,13 +3,12 @@ package jface;
 import java.util.ArrayList;
 
 public class Session {
-    ArrayList<Entity> unsavedRecords;
+    private ArrayList<Entity> unsavedRecords;
 
-    String name;
-    int group;
-    boolean swtDone;
-
-    int activeRecord;
+    private String name;
+    private int group;
+    private boolean swtDone;
+    private int activeRecord;
 
     public Session() {
 	this.unsavedRecords = new ArrayList<>();
