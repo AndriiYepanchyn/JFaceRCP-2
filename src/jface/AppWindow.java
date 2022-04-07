@@ -1,13 +1,20 @@
 package jface;
 
+import java.lang.reflect.Method;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
@@ -21,13 +28,37 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import actions.ExitAction;
+import actions.NewFileAction;
+import actions.SaveAction;
+
 public class AppWindow extends ApplicationWindow {
     Shell mainWindow;
     Font font;
+    Session ses = SessionManager.getInstatnce();
 
     public AppWindow() {
 	super(null);
 	addMenuBar();
+	ses.addEntity("name 1", 1, true);
+	ses.addEntity("name 2", 2, false);
+	ses.addEntity("name 3", 1, true);
+	ses.addEntity("name 4", 2, false);
+	ses.addEntity("name 5", 1, false);
+	ses.addEntity("name 6", 2, true);
+	ses.addEntity("name 11", 1, true);
+	ses.addEntity("name 21", 2, false);
+	ses.addEntity("name 31", 1, true);
+	ses.addEntity("name 41", 2, false);
+	ses.addEntity("name 51", 1, false);
+	ses.addEntity("name 61", 2, true);
+	ses.addEntity("name 12", 1, true);
+	ses.addEntity("name 22", 2, false);
+	ses.addEntity("name 32", 1, true);
+	ses.addEntity("name 42", 2, false);
+	ses.addEntity("name 52", 1, false);
+	ses.addEntity("name 62", 2, true);
+	// System.out.println(ses.toString());
     }
 
     public AppWindow(Shell parentShell) {
@@ -37,7 +68,7 @@ public class AppWindow extends ApplicationWindow {
     @Override
     protected void initializeBounds() {
 	int xSize = 800;
-	int ySize = 250;
+	int ySize = 270;
 	Rectangle sizes = getShell().getDisplay().getBounds();
 	int x = sizes.width;
 	int y = sizes.height;
@@ -61,24 +92,20 @@ public class AppWindow extends ApplicationWindow {
 
     @Override
     protected MenuManager createMenuManager() {
+
 	MenuManager mainMenu = new MenuManager();
 	MenuManager menuFile = new MenuManager("&File", "1");
 	mainMenu.add(menuFile);
 
-	menuFile.add(new Action("New file \tCtrl+N") {
-	    	System.out.println("ggg");
-	});
-
+	menuFile.add(new NewFileAction(this));
+	menuFile.add(new SaveAction(this));
 	menuFile.add(new Action("Open \tCtrl+O") {
-
 	});
-
 	menuFile.add(new Action("Save \tCtrl+S") {
 	});
+	menuFile.add(new ExitAction(this));
 
-	menuFile.add(new Action("Exit \tCtrl+X") {
-	});
-
+	// Edit Menu
 	MenuManager menuEdit = new MenuManager("&Edit", "2");
 	mainMenu.add(menuEdit);
 
@@ -111,56 +138,22 @@ public class AppWindow extends ApplicationWindow {
 	// Start create Left part
 	Composite child1 = new Composite(form, SWT.BORDER);
 	child1.setLayout(new FillLayout());
-
-	TableViewer viewer = new TableViewer(child1, SWT.BORDER | SWT.FULL_SELECTION);
+	TableViewer viewer = createTableViewer(child1);
 
 	// Start create right part
 	Composite child2 = new Composite(form, SWT.BORDER);
 	FillLayout fill2 = new FillLayout(SWT.VERTICAL);
 	child2.setLayout(fill2);
 
-	Composite child21 = new Composite(child2, SWT.BORDER);
-	GridLayout grid21 = new GridLayout(4, false);
-	grid21.marginHeight = 5;
-	grid21.marginWidth = 5;
-	grid21.horizontalSpacing = 10;
-	grid21.verticalSpacing = 10;
-	grid21.marginBottom = 10;
-	child21.setLayout(grid21);
-
-	GridData gridForLabel = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-	gridForLabel.grabExcessHorizontalSpace = true;
-	gridForLabel.horizontalSpan = 1;
-	gridForLabel.widthHint = 60;
-	gridForLabel.heightHint = 30;
-
-	GridData gridForText = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_END);
-	gridForText.grabExcessHorizontalSpace = true;
-	gridForText.horizontalSpan = 3;
-	gridForText.widthHint = 120;
-	gridForText.heightHint = 30;
-
-	GridData gridForButton = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_FILL);
-	gridForButton.grabExcessHorizontalSpace = true;
-	gridForButton.horizontalSpan = 1;
-	gridForButton.widthHint = 60;
-	gridForButton.heightHint = 30;
-
-	GridData gridForButtonNew = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_FILL);
-	gridForButtonNew.grabExcessHorizontalSpace = true;
-	gridForButtonNew.horizontalSpan = 1;
-	gridForButtonNew.horizontalIndent = 20;
-	gridForButtonNew.widthHint = 60;
-	gridForButtonNew.heightHint = 30;
+	Composite child21 = createRightFieldArea(child2);
 
 	// Labels
-
 	Label labelName = new Label(child21, SWT.NONE);
 	labelName.setText("Name");
-	labelName.setLayoutData(gridForLabel);
+	labelName.setLayoutData(createGridForLabel());
 
 	Text textName = new Text(child21, SWT.BORDER);
-	textName.setLayoutData(gridForText);
+	textName.setLayoutData(createGridForText());
 	textName.addModifyListener(new ModifyListener() {
 
 	    @Override
@@ -169,56 +162,136 @@ public class AppWindow extends ApplicationWindow {
 		System.out.println("key pressed");
 	    }
 	});
-	;
 
 	Label labelGroup = new Label(child21, SWT.NONE);
 	labelGroup.setText("Group");
-	labelGroup.setLayoutData(gridForLabel);
+	labelGroup.setLayoutData(createGridForLabel());
 
 	Text textGroup = new Text(child21, SWT.BORDER);
-	textGroup.setLayoutData(gridForText);
+	textGroup.setLayoutData(createGridForText());
 
 	Label labelSWTDone = new Label(child21, SWT.NONE);
 	labelSWTDone.setText("SWT task is done?");
-	labelSWTDone.setLayoutData(gridForLabel);
+	labelSWTDone.setLayoutData(createGridForLabel());
 
 	Button buttonSWTDone = new Button(child21, SWT.CHECK);
 	buttonSWTDone.setSelection(false);
-	buttonSWTDone.setLayoutData(gridForText);
+	buttonSWTDone.setLayoutData(createGridForText());
 
 	// Buttons
-
-	Button buttonNew = new Button(child21, SWT.PUSH);
-	buttonNew.setLayoutData(gridForButtonNew);
-	buttonNew.setText("New");
-
-	Button buttonSave = new Button(child21, SWT.PUSH);
-	buttonSave.setLayoutData(gridForButton);
-	buttonSave.setText("Save");
-
-	Button buttonDelete = new Button(child21, SWT.PUSH);
-	buttonDelete.setLayoutData(gridForButton);
-	buttonDelete.setText("Delete");
-
-	Button buttonCancel = new Button(child21, SWT.PUSH);
-	buttonCancel.setLayoutData(gridForButton);
-	buttonCancel.setText("Cancel");
+	Button buttonNew = createButton(child21, "New", createGridForButtonNew());
+	Button buttonSave = createButton(child21, "Save", createGridForButton());
+	Button buttonDelete = createButton(child21, "Delete", createGridForButton());
+	Button buttonCancel = createButton(child21, "Cancel", createGridForButton());
 
 	form.setWeights(new int[] { 70, 50 });
     }
 
-//    private static Text createTextName(Composite c) {
-//	Text textName = new Text(c, SWT.BORDER);
-//	textName.setLayoutData(gridForText);
-//	textName.addModifyListener(new ModifyListener() {
-//
-//	    @Override
-//	    public void modifyText(ModifyEvent e) {
-//		// TODO
-//		System.out.println("key pressed");
-//	    }
-//	});
-//	;
-//    }
+    public static Composite createRightFieldArea(Composite parent) {
+	Composite child = new Composite(parent, SWT.BORDER);
+	GridLayout gridLayout = new GridLayout(4, false);
+	gridLayout.marginHeight = 5;
+	gridLayout.marginWidth = 5;
+	gridLayout.horizontalSpacing = 10;
+	gridLayout.verticalSpacing = 10;
+	gridLayout.marginBottom = 10;
+	child.setLayout(gridLayout);
+	return child;
+    }
 
+    public static GridData createGridForLabel() {
+	GridData gridForLabel = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+	gridForLabel.grabExcessHorizontalSpace = true;
+	gridForLabel.horizontalSpan = 1;
+	gridForLabel.widthHint = 60;
+	gridForLabel.heightHint = 30;
+	return gridForLabel;
+    }
+
+    public static GridData createGridForText() {
+	GridData gridForText = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_END);
+	gridForText.grabExcessHorizontalSpace = true;
+	gridForText.horizontalSpan = 3;
+	gridForText.widthHint = 120;
+	gridForText.heightHint = 30;
+	return gridForText;
+    }
+
+    public static GridData createGridForButton() {
+	GridData gridForButton = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_FILL);
+	gridForButton.grabExcessHorizontalSpace = true;
+	gridForButton.horizontalSpan = 1;
+	gridForButton.widthHint = 60;
+	gridForButton.heightHint = 30;
+	return gridForButton;
+    }
+
+    public static GridData createGridForButtonNew() {
+	GridData gridForButtonNew = new GridData(GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_FILL);
+	gridForButtonNew.grabExcessHorizontalSpace = true;
+	gridForButtonNew.horizontalSpan = 1;
+	gridForButtonNew.horizontalIndent = 20;
+	gridForButtonNew.widthHint = 60;
+	gridForButtonNew.heightHint = 30;
+	return gridForButtonNew;
+    }
+
+    public Button createButton(Composite parent, String text, GridData buttonGridData) {
+	Button button = new Button(parent, SWT.PUSH);
+	button.setLayoutData(buttonGridData);
+	button.setText(text);
+
+	return button;
+    }
+
+    public TableViewer createTableViewer(Composite parent) {
+	TableViewer viewer = new TableViewer(parent, SWT.BORDER | SWT.FULL_SELECTION);
+	viewer.setContentProvider(ArrayContentProvider.getInstance());
+
+	String[] columnNameStrings = Entity.getArrayOfEntityFields();
+	for (String colName : columnNameStrings) {
+	    createColumnName(viewer, colName);
+	}
+
+	viewer.getTable().getColumn(2).setWidth(80);
+	viewer.setInput(ses.getAllRecords());
+	viewer.getTable().setLinesVisible(true);
+	viewer.getTable().setHeaderVisible(true);
+	viewer.getTable().setHeaderBackground(new Color(181, 181, 181));
+	return viewer;
+    }
+
+    private void createColumnName(TableViewer viewer, String columnName) {
+	TableViewerColumn column = new TableViewerColumn(viewer, SWT.CHECK);
+	column.getColumn().setText(columnName.toUpperCase());
+	column.getColumn().setWidth(180);
+	column.getColumn().setAlignment(SWT.CENTER);
+	column.getColumn().setMoveable(false);
+	column.getColumn().setResizable(false);
+	column.setLabelProvider(new ColumnLabelProvider() {
+	    @Override
+	    public String getText(Object element) {
+		return getElementValue(columnName, element);
+	    }
+	});
+	ColumnViewerComparator cSorter = new ColumnViewerComparator(viewer, column) {
+	    @Override
+	    protected int doCompare(Viewer viewer, Object e1, Object e2) {
+		String p1 = getElementValue(columnName, e1);
+		String p2 = getElementValue(columnName, e2);
+		return p1.compareToIgnoreCase(p2);
+	    }
+	};
+    }
+
+    private String getElementValue(String columnName, Object element) {
+	String answerString = "";
+	try {
+	    Method tmpMethod = Entity.getRefferedMethods().get(columnName);
+	    answerString = String.valueOf(tmpMethod.invoke((Entity) element));
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+	return answerString;
+    }
 }

@@ -1,13 +1,10 @@
 package toRemove;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
@@ -17,6 +14,8 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+
+import jface.AbstractEditingSupport;
 
 //Sorted table
 public class Snippet40 {
@@ -33,49 +32,24 @@ public class Snippet40 {
 	}
     }
 
-    protected abstract class AbstractEditingSupport extends EditingSupport {
-	private TextCellEditor editor;
-
-	public AbstractEditingSupport(TableViewer viewer) {
-	    super(viewer);
-	    this.editor = new TextCellEditor(viewer.getTable());
-	}
-
-	@Override
-	protected boolean canEdit(Object element) {
-	    return true;
-	}
-
-	@Override
-	protected CellEditor getCellEditor(Object element) {
-	    return editor;
-	}
-
-	@Override
-	protected void setValue(Object element, Object value) {
-	    doSetValue(element, value);
-	    getViewer().update(element, null);
-	}
-
-	protected abstract void doSetValue(Object element, Object value);
-    }
-
     public Snippet40(Shell shell) {
+// Table viewer =============================================================
+	TableViewer tableViewer = new TableViewer(shell, SWT.BORDER | SWT.FULL_SELECTION);
+	tableViewer.setContentProvider(ArrayContentProvider.getInstance());
 
-	TableViewer viewer = new TableViewer(shell, SWT.BORDER | SWT.FULL_SELECTION);
-	viewer.setContentProvider(ArrayContentProvider.getInstance());
+// Column GivenName =========================================================
 
-	TableViewerColumn column = createColumnFor(viewer, "Givenname");
+	TableViewerColumn column;
+	/* */ column = createColumnFor(tableViewer, "Givenname");
+
 	column.setLabelProvider(new ColumnLabelProvider() {
-
 	    @Override
 	    public String getText(Object element) {
 		return ((Person) element).givenname;
 	    }
 	});
 
-	column.setEditingSupport(new AbstractEditingSupport(viewer) {
-
+	column.setEditingSupport(new AbstractEditingSupport(tableViewer) {
 	    @Override
 	    protected Object getValue(Object element) {
 		return ((Person) element).givenname;
@@ -87,29 +61,26 @@ public class Snippet40 {
 	    }
 
 	});
-
-	ColumnViewerComparator cSorter = new ColumnViewerComparator(viewer, column) {
-
+//3	
+	ColumnViewerComparator cSorter = new ColumnViewerComparator(tableViewer, column) {
 	    @Override
 	    protected int doCompare(Viewer viewer, Object e1, Object e2) {
 		Person p1 = (Person) e1;
 		Person p2 = (Person) e2;
 		return p1.givenname.compareToIgnoreCase(p2.givenname);
 	    }
-
 	};
 
-	column = createColumnFor(viewer, "Surname");
+//===========================================================================
+	column = createColumnFor(tableViewer, "Surname");
 	column.setLabelProvider(new ColumnLabelProvider() {
-
 	    @Override
 	    public String getText(Object element) {
 		return ((Person) element).surname;
 	    }
 
 	});
-
-	column.setEditingSupport(new AbstractEditingSupport(viewer) {
+	column.setEditingSupport(new AbstractEditingSupport(tableViewer) {
 
 	    @Override
 	    protected Object getValue(Object element) {
@@ -122,9 +93,7 @@ public class Snippet40 {
 	    }
 
 	});
-
-	new ColumnViewerComparator(viewer, column) {
-
+	new ColumnViewerComparator(tableViewer, column) {
 	    @Override
 	    protected int doCompare(Viewer viewer, Object e1, Object e2) {
 		Person p1 = (Person) e1;
@@ -134,17 +103,16 @@ public class Snippet40 {
 
 	};
 
-	column = createColumnFor(viewer, "E-Mail");
-	column.setLabelProvider(new ColumnLabelProvider() {
+//===========================================================================
 
+	column = createColumnFor(tableViewer, "E-Mail");
+	column.setLabelProvider(new ColumnLabelProvider() {
 	    @Override
 	    public String getText(Object element) {
 		return ((Person) element).email;
 	    }
-
 	});
-
-	column.setEditingSupport(new AbstractEditingSupport(viewer) {
+	column.setEditingSupport(new AbstractEditingSupport(tableViewer) {
 
 	    @Override
 	    protected Object getValue(Object element) {
@@ -157,8 +125,7 @@ public class Snippet40 {
 	    }
 
 	});
-
-	new ColumnViewerComparator(viewer, column) {
+	new ColumnViewerComparator(tableViewer, column) {
 
 	    @Override
 	    protected int doCompare(Viewer viewer, Object e1, Object e2) {
@@ -169,11 +136,15 @@ public class Snippet40 {
 
 	};
 
-	viewer.setInput(createModel());
-	viewer.getTable().setLinesVisible(true);
-	viewer.getTable().setHeaderVisible(true);
+//==========================================================================	
+
+	tableViewer.setInput(createModel());
+	tableViewer.getTable().setLinesVisible(true);
+	tableViewer.getTable().setHeaderVisible(true);
 	cSorter.setSorter(cSorter, ColumnViewerComparator.ASC);
     }
+
+// End of constructor=======================================================
 
     private TableViewerColumn createColumnFor(TableViewer viewer, String label) {
 	TableViewerColumn column = new TableViewerColumn(viewer, SWT.NONE);
@@ -182,6 +153,8 @@ public class Snippet40 {
 	column.getColumn().setMoveable(true);
 	return column;
     }
+
+// Unneccassary=============================================================
 
     private Person[] createModel() {
 	return new Person[] { new Person("Tom", "Schindl", "tom.schindl@bestsolution.at"),
@@ -192,6 +165,8 @@ public class Snippet40 {
 		new Person("Lars", "Vogel", "Lars.Vogel@gmail.com"),
 		new Person("Hendrik", "Still", "hendrik.still@gammas.de") };
     }
+
+// To replace==============================================================
 
     private static abstract class ColumnViewerComparator extends ViewerComparator {
 
@@ -262,6 +237,8 @@ public class Snippet40 {
 
 	protected abstract int doCompare(Viewer viewer, Object e1, Object e2);
     }
+
+//Main====================================================================    
 
     /**
      * @param args

@@ -5,7 +5,7 @@ import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 
-abstract class AbstractEditingSupport extends EditingSupport {
+public abstract class AbstractEditingSupport extends EditingSupport {
     private TextCellEditor editor;
 
     public AbstractEditingSupport(TableViewer viewer) {
