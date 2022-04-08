@@ -8,7 +8,7 @@ public class Session {
     private String name;
     private int group;
     private boolean swtDone;
-    private int activeRecord;
+    private Entity activeRecord;
     private String fileName;
     private String fileType;
 
@@ -17,7 +17,7 @@ public class Session {
 	this.name = "";
 	this.group = 0;
 	this.swtDone = false;
-	this.activeRecord = 0;
+	this.activeRecord = null;
     }
 
 //Setters
@@ -33,7 +33,7 @@ public class Session {
 	this.swtDone = isDone;
     }
 
-    public void setActiveRecord(int activeRecord) {
+    public void setActiveRecord(Entity activeRecord) {
 	this.activeRecord = activeRecord;
     }
 
@@ -45,7 +45,7 @@ public class Session {
 	this.fileType = fileType;
     }
 
-    public int getActiveRecord() {
+    public Entity getActiveRecord() {
 	return activeRecord;
     }
 
@@ -86,7 +86,9 @@ public class Session {
 	this.name = "";
 	this.group = 0;
 	this.swtDone = false;
-	this.activeRecord = 0;
+	this.activeRecord = null;
+	this.fileName = "";
+	this.fileType = "";
     }
 
     public void removeByIndex(int index) {
@@ -98,7 +100,7 @@ public class Session {
     public String toString() {
 	StringBuilder answer = new StringBuilder();
 	for (Entity s : unsavedRecords) {
-	    answer.append("Name: " + s.getName() + ", group: " + s.getGroup() + ", SWT Done: " + s.isSwtDone() + "\n");
+	    answer.append("Name: " + s.getName() + ", group: " + s.getGroup() + ", SWT Done: " + s.getSwtDone() + "\n");
 	}
 	return answer.toString();
     }

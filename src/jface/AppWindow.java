@@ -6,14 +6,15 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Rectangle;
@@ -35,6 +36,9 @@ import actions.SaveAction;
 public class AppWindow extends ApplicationWindow {
     Shell mainWindow;
     Font font;
+    Text textName;
+    Text textGroup;
+    Button buttonSWTDone;
     Session ses = SessionManager.getInstatnce();
 
     public AppWindow() {
@@ -85,7 +89,6 @@ public class AppWindow extends ApplicationWindow {
 	Group generalComposite = new Group(mainWindow, SWT.V_SCROLL);
 	generalComposite.setLayout(new FillLayout());
 	createSash(generalComposite);
-
 	parent.pack();
 	return parent;
     }
@@ -152,29 +155,29 @@ public class AppWindow extends ApplicationWindow {
 	labelName.setText("Name");
 	labelName.setLayoutData(createGridForLabel());
 
-	Text textName = new Text(child21, SWT.BORDER);
+	textName = new Text(child21, SWT.BORDER);
 	textName.setLayoutData(createGridForText());
-	textName.addModifyListener(new ModifyListener() {
-
-	    @Override
-	    public void modifyText(ModifyEvent e) {
-		// TODO
-		System.out.println("key pressed");
-	    }
-	});
+//	textName.addModifyListener(new ModifyListener() {
+//
+//	    @Override
+//	    public void modifyText(ModifyEvent e) {
+//		// TODO
+//		System.out.println("key pressed");
+//	    }
+//	});
 
 	Label labelGroup = new Label(child21, SWT.NONE);
 	labelGroup.setText("Group");
 	labelGroup.setLayoutData(createGridForLabel());
 
-	Text textGroup = new Text(child21, SWT.BORDER);
+	textGroup = new Text(child21, SWT.BORDER);
 	textGroup.setLayoutData(createGridForText());
 
 	Label labelSWTDone = new Label(child21, SWT.NONE);
 	labelSWTDone.setText("SWT task is done?");
 	labelSWTDone.setLayoutData(createGridForLabel());
 
-	Button buttonSWTDone = new Button(child21, SWT.CHECK);
+	buttonSWTDone = new Button(child21, SWT.CHECK);
 	buttonSWTDone.setSelection(false);
 	buttonSWTDone.setLayoutData(createGridForText());
 
@@ -258,6 +261,18 @@ public class AppWindow extends ApplicationWindow {
 	viewer.getTable().setLinesVisible(true);
 	viewer.getTable().setHeaderVisible(true);
 	viewer.getTable().setHeaderBackground(new Color(181, 181, 181));
+	viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+	    @Override
+	    public void selectionChanged(SelectionChangedEvent event) {
+		IStructuredSelection selection = viewer.getStructuredSelection();
+		Object firstElement = selection.getFirstElement();
+		ses.setActiveRecord((Entity) firstElement);
+		// System.out.println(ses.getActiveRecord());
+		textName.setText(ses.getActiveRecord().getName());
+		textGroup.setText(String.valueOf(ses.getActiveRecord().getGroup()));
+		buttonSWTDone.setSelection(ses.getActiveRecord().getSwtDone());
+	    }
+	});
 	return viewer;
     }
 
