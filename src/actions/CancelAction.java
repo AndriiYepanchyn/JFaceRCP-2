@@ -5,10 +5,10 @@ import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 
-public class ExitAction extends Action {
+public class CancelAction extends Action {
     ApplicationWindow _window;
 
-    public ExitAction(ApplicationWindow window) {
+    public CancelAction(ApplicationWindow window) {
 	_window = window;
 	setText("Exit \tCtrl+X");
 	setToolTipText("Exit Application");
@@ -16,7 +16,6 @@ public class ExitAction extends Action {
     }
 
     public void run() {
-
 	MessageBox saveDialogBox = new MessageBox(_window.getShell(), SWT.YES | SWT.NO);
 	saveDialogBox.setMessage("Save changes to file?");
 	saveDialogBox.setText("Save dialog");

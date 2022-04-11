@@ -28,8 +28,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -44,18 +46,21 @@ public class AppWindow extends ApplicationWindow {
     Text textGroup;
     Button buttonSWTDone;
     int indexToRemove;
+
+    Button buttonNew;
     Session ses = SessionManager.getInstatnce();
     Entity newEntity;
 
     public AppWindow() {
 	super(null);
-	addMenuBar();
+
 	ses.addEntity("name 1", "1", true);
 	ses.addEntity("name 2", "2", false);
 	ses.addEntity("name 3", "1", true);
 	ses.addEntity("name 4", "2", false);
 	ses.addEntity("name 5", "1", false);
 	ses.addEntity("name 6", "2", true);
+	addMenuBar();
     }
 
     public AppWindow(Shell parentShell) {
@@ -97,6 +102,7 @@ public class AppWindow extends ApplicationWindow {
 	menuFile.add(new SaveAction(this));
 	menuFile.add(new Action("Open \tCtrl+O") {
 	});
+
 	menuFile.add(new ExitAction(this));
 
 	// Edit Menu
@@ -113,6 +119,13 @@ public class AppWindow extends ApplicationWindow {
 	});
 
 	menuEdit.add(new Action("Cancel \tCtrl+Q") {
+	});
+
+	menuEdit.add(new Action("Cancel \tCtrl+O") {
+//	    {
+//		System.out.println(ses);
+//		clearFields();
+//	    }
 	});
 
 	MenuManager menuAbout = new MenuManager("&About", "3");
@@ -151,6 +164,7 @@ public class AppWindow extends ApplicationWindow {
 	textName.addModifyListener(new ModifyListener() {
 	    @Override
 	    public void modifyText(ModifyEvent e) {
+		// Добавить затенение кнопки нью, валидацию
 	    }
 	});
 
@@ -168,9 +182,17 @@ public class AppWindow extends ApplicationWindow {
 	buttonSWTDone = new Button(child21, SWT.CHECK);
 	buttonSWTDone.setSelection(false);
 	buttonSWTDone.setLayoutData(createGridForText());
+	buttonSWTDone.addListener(SWT.Selection, new Listener() {
+
+	    @Override
+	    public void handleEvent(Event event) {
+		// TODO
+		// if(ses.activeRecord.getSwtDone()==buttonSWTDone.)
+	    }
+	});
 
 	// Buttons
-	Button buttonNew = createButton(child21, "New", createGridForButtonNew());
+	buttonNew = createButton(child21, "New", createGridForButtonNew());
 	buttonNew.addSelectionListener(new SelectionListener() {
 
 	    @Override
@@ -190,26 +212,23 @@ public class AppWindow extends ApplicationWindow {
 
 	Button buttonSave = createButton(child21, "Save", createGridForButton());
 	buttonSave.addSelectionListener(new SelectionListener() {
-//TODO
 	    @Override
 	    public void widgetSelected(SelectionEvent e) {
-		ses.name = textName.getText();
-		ses.group = textGroup.getText();
-		ses.swtDone = (buttonSWTDone.getSelection());
-		if (newEntity == null) {
-		    IStructuredSelection selection = viewer.getStructuredSelection();
-		    newEntity = ((Entity) selection.getFirstElement());
-
-		    ses.activeRecord.setName(ses.name);
-		    ses.activeRecord.setGroup(ses.group);
-		    ses.activeRecord.setSwtDone(ses.swtDone);
-		    ses.addEntity(ses.activeRecord);
-		} else {
-		    ses.addEntity(ses.name, ses.group, ses.swtDone);
-
+		if (ses.activeRecord != null) {
+		    ses.name = textName.getText();
+		    ses.group = textGroup.getText();
+		    ses.swtDone = buttonSWTDone.getSelection();
+		    boolean answer = (ses.activeRecord.getName().equals(ses.name)
+			    && ses.activeRecord.getGroup().equals(ses.group)
+			    && ses.activeRecord.getSwtDone() == ses.swtDone);
+		    if (!answer) {
+			ses.addEntity(ses.name, ses.group, ses.swtDone);
+			viewer.refresh();
+			viewer.getTable().deselectAll();
+			clearFields();
+			buttonSave.setEnabled(false);
+		    }
 		}
-		viewer.refresh();
-		newEntity = null;
 	    }
 
 	    @Override
@@ -241,6 +260,8 @@ public class AppWindow extends ApplicationWindow {
 		viewer.getTable().deselectAll();
 		clearFields();
 		viewer.refresh();
+		buttonSave.setEnabled(false);
+
 	    }
 
 	    @Override
@@ -321,6 +342,7 @@ public class AppWindow extends ApplicationWindow {
 
 	viewer.getTable().getColumn(2).setWidth(80);
 	viewer.setInput(ses.getAllRecords());
+	viewer.getTable().setSelection(0);
 	viewer.getTable().setLinesVisible(true);
 	viewer.getTable().setHeaderVisible(true);
 	viewer.getTable().setHeaderBackground(new Color(181, 181, 181));
@@ -374,7 +396,6 @@ public class AppWindow extends ApplicationWindow {
     }
 
     private void setFields() {
-
 	textName.setText(ses.name);
 	textName.redraw();
 	textGroup.setText(ses.group);
@@ -383,10 +404,11 @@ public class AppWindow extends ApplicationWindow {
 	buttonSWTDone.redraw();
     }
 
-    private void clearFields() {
+    public void clearFields() {
 	ses.name = "";
 	ses.group = "";
 	ses.swtDone = false;
+	ses.activeRecord = null;
 	setFields();
     }
 }
