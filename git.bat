@@ -1,3 +1,4 @@
-git add --all
-git commit -m "Edited button functionality"
-git push
+
+git.exe add --all
+git.exe commit -m "save through bat file"
+git.exe push
