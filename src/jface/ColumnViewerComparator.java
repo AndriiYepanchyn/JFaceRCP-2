@@ -28,11 +28,9 @@ public abstract class ColumnViewerComparator extends ViewerComparator {
 
     private SelectionAdapter createSelectionAdapter() {
 	return new SelectionAdapter() {
-
 	    @Override
 	    public void widgetSelected(SelectionEvent e) {
 		if (ColumnViewerComparator.this.viewer.getComparator() != null) {
-		    // TODO What does it compare with in 220
 		    if (ColumnViewerComparator.this.viewer.getComparator() == ColumnViewerComparator.this) {
 			int tdirection = ColumnViewerComparator.this.direction;
 			if (tdirection == ASC) {
@@ -72,9 +70,9 @@ public abstract class ColumnViewerComparator extends ViewerComparator {
     }
 
     @Override
-    public int compare(Viewer viewer, Object e1, Object e2) {
-	return direction * doCompare(viewer, e1, e2);
+    public int compare(Viewer tmpViewer, Object e1, Object e2) {
+	return direction * doCompare(tmpViewer, e1, e2);
     }
 
-    protected abstract int doCompare(Viewer viewer, Object e1, Object e2);
+    protected abstract int doCompare(Viewer tmpViewer, Object e1, Object e2);
 }

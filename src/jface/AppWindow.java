@@ -15,6 +15,10 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.window.ApplicationWindow;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Rectangle;
@@ -39,30 +43,19 @@ public class AppWindow extends ApplicationWindow {
     Text textName;
     Text textGroup;
     Button buttonSWTDone;
+    int indexToRemove;
     Session ses = SessionManager.getInstatnce();
+    Entity newEntity;
 
     public AppWindow() {
 	super(null);
 	addMenuBar();
-	ses.addEntity("name 1", 1, true);
-	ses.addEntity("name 2", 2, false);
-	ses.addEntity("name 3", 1, true);
-	ses.addEntity("name 4", 2, false);
-	ses.addEntity("name 5", 1, false);
-	ses.addEntity("name 6", 2, true);
-	ses.addEntity("name 11", 1, true);
-	ses.addEntity("name 21", 2, false);
-	ses.addEntity("name 31", 1, true);
-	ses.addEntity("name 41", 2, false);
-	ses.addEntity("name 51", 1, false);
-	ses.addEntity("name 61", 2, true);
-	ses.addEntity("name 12", 1, true);
-	ses.addEntity("name 22", 2, false);
-	ses.addEntity("name 32", 1, true);
-	ses.addEntity("name 42", 2, false);
-	ses.addEntity("name 52", 1, false);
-	ses.addEntity("name 62", 2, true);
-	// System.out.println(ses.toString());
+	ses.addEntity("name 1", "1", true);
+	ses.addEntity("name 2", "2", false);
+	ses.addEntity("name 3", "1", true);
+	ses.addEntity("name 4", "2", false);
+	ses.addEntity("name 5", "1", false);
+	ses.addEntity("name 6", "2", true);
     }
 
     public AppWindow(Shell parentShell) {
@@ -103,8 +96,6 @@ public class AppWindow extends ApplicationWindow {
 	menuFile.add(new NewFileAction(this));
 	menuFile.add(new SaveAction(this));
 	menuFile.add(new Action("Open \tCtrl+O") {
-	});
-	menuFile.add(new Action("Save \tCtrl+S") {
 	});
 	menuFile.add(new ExitAction(this));
 
@@ -157,14 +148,11 @@ public class AppWindow extends ApplicationWindow {
 
 	textName = new Text(child21, SWT.BORDER);
 	textName.setLayoutData(createGridForText());
-//	textName.addModifyListener(new ModifyListener() {
-//
-//	    @Override
-//	    public void modifyText(ModifyEvent e) {
-//		// TODO
-//		System.out.println("key pressed");
-//	    }
-//	});
+	textName.addModifyListener(new ModifyListener() {
+	    @Override
+	    public void modifyText(ModifyEvent e) {
+	    }
+	});
 
 	Label labelGroup = new Label(child21, SWT.NONE);
 	labelGroup.setText("Group");
@@ -183,9 +171,84 @@ public class AppWindow extends ApplicationWindow {
 
 	// Buttons
 	Button buttonNew = createButton(child21, "New", createGridForButtonNew());
+	buttonNew.addSelectionListener(new SelectionListener() {
+
+	    @Override
+	    public void widgetSelected(SelectionEvent e) {
+		if (newEntity == null) {
+		    clearFields();
+		    newEntity = new Entity();
+		}
+	    }
+
+	    @Override
+	    public void widgetDefaultSelected(SelectionEvent e) {
+		// TODO Auto-generated method stub
+
+	    }
+	});
+
 	Button buttonSave = createButton(child21, "Save", createGridForButton());
+	buttonSave.addSelectionListener(new SelectionListener() {
+//TODO
+	    @Override
+	    public void widgetSelected(SelectionEvent e) {
+		ses.name = textName.getText();
+		ses.group = textGroup.getText();
+		ses.swtDone = (buttonSWTDone.getSelection());
+		if (newEntity == null) {
+		    IStructuredSelection selection = viewer.getStructuredSelection();
+		    newEntity = ((Entity) selection.getFirstElement());
+
+		    ses.activeRecord.setName(ses.name);
+		    ses.activeRecord.setGroup(ses.group);
+		    ses.activeRecord.setSwtDone(ses.swtDone);
+		    ses.addEntity(ses.activeRecord);
+		} else {
+		    ses.addEntity(ses.name, ses.group, ses.swtDone);
+
+		}
+		viewer.refresh();
+		newEntity = null;
+	    }
+
+	    @Override
+	    public void widgetDefaultSelected(SelectionEvent e) {
+		// TODO Auto-generated method stub
+
+	    }
+	});
+
 	Button buttonDelete = createButton(child21, "Delete", createGridForButton());
+	buttonDelete.addSelectionListener(new SelectionListener() {
+	    @Override
+	    public void widgetSelected(SelectionEvent e) {
+		ses.removeCurrentObject();
+		viewer.getTable().deselectAll();
+		setFields();
+		viewer.refresh();
+	    }
+
+	    @Override
+	    public void widgetDefaultSelected(SelectionEvent e) {
+	    }
+	});
+
 	Button buttonCancel = createButton(child21, "Cancel", createGridForButton());
+	buttonCancel.addSelectionListener(new SelectionListener() {
+	    @Override
+	    public void widgetSelected(SelectionEvent e) {
+		viewer.getTable().deselectAll();
+		clearFields();
+		viewer.refresh();
+	    }
+
+	    @Override
+	    public void widgetDefaultSelected(SelectionEvent e) {
+		// TODO Auto-generated method stub
+
+	    }
+	});
 
 	form.setWeights(new int[] { 70, 50 });
     }
@@ -261,16 +324,16 @@ public class AppWindow extends ApplicationWindow {
 	viewer.getTable().setLinesVisible(true);
 	viewer.getTable().setHeaderVisible(true);
 	viewer.getTable().setHeaderBackground(new Color(181, 181, 181));
+
 	viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 	    @Override
 	    public void selectionChanged(SelectionChangedEvent event) {
 		IStructuredSelection selection = viewer.getStructuredSelection();
-		Object firstElement = selection.getFirstElement();
-		ses.setActiveRecord((Entity) firstElement);
-		// System.out.println(ses.getActiveRecord());
-		textName.setText(ses.getActiveRecord().getName());
-		textGroup.setText(String.valueOf(ses.getActiveRecord().getGroup()));
-		buttonSWTDone.setSelection(ses.getActiveRecord().getSwtDone());
+		ses.activeRecord = (Entity) selection.getFirstElement();
+		ses.name = ses.activeRecord.getName();
+		ses.group = ses.activeRecord.getGroup();
+		ses.swtDone = ses.activeRecord.getSwtDone();
+		setFields();
 	    }
 	});
 	return viewer;
@@ -308,5 +371,22 @@ public class AppWindow extends ApplicationWindow {
 	    e.printStackTrace();
 	}
 	return answerString;
+    }
+
+    private void setFields() {
+
+	textName.setText(ses.name);
+	textName.redraw();
+	textGroup.setText(ses.group);
+	textGroup.redraw();
+	buttonSWTDone.setSelection(ses.swtDone);
+	buttonSWTDone.redraw();
+    }
+
+    private void clearFields() {
+	ses.name = "";
+	ses.group = "";
+	ses.swtDone = false;
+	setFields();
     }
 }

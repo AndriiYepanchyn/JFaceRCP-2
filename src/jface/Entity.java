@@ -6,13 +6,13 @@ import java.util.HashMap;
 
 public class Entity {
     private String name;
-    private int group;
+    private String group;
     private boolean swtDone;
 
     public Entity() {
     }
 
-    public Entity(String name, int group, boolean swtDone) {
+    public Entity(String name, String group, boolean swtDone) {
 	this.name = name;
 	this.group = group;
 	this.swtDone = swtDone;
@@ -26,11 +26,11 @@ public class Entity {
 	this.name = name;
     }
 
-    public int getGroup() {
+    public String getGroup() {
 	return group;
     }
 
-    public void setGroup(int group) {
+    public void setGroup(String group) {
 	this.group = group;
     }
 

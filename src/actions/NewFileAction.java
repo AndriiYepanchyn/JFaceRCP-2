@@ -3,7 +3,7 @@ package actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.window.ApplicationWindow;
 
-import jface.AppWindow;
+import jface.SessionManager;
 
 public class NewFileAction extends Action {
     ApplicationWindow _window;
@@ -16,7 +16,8 @@ public class NewFileAction extends Action {
     }
 
     public void run() {
-	((AppWindow) _window).getSession().clear();
+	SessionManager.getInstatnce().clear();
 	System.out.println("New File");
+
     }
 }
