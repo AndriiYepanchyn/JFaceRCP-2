@@ -1,14 +1,14 @@
-package actions;
+package actions.menuFileActions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.window.ApplicationWindow;
 
+import jface.AppWindow;
 import jface.SessionManager;
 
 public class NewFileAction extends Action {
-    ApplicationWindow _window;
+    AppWindow _window;
 
-    public NewFileAction(ApplicationWindow window) {
+    public NewFileAction(AppWindow window) {
 	_window = window;
 	setText("New File \tCtrl+N");
 	setToolTipText("New File");

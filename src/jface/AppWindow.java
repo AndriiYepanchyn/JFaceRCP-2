@@ -35,9 +35,13 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import actions.ExitAction;
-import actions.NewFileAction;
-import actions.SaveAction;
+import actions.menuEditActions.CancelAction;
+import actions.menuEditActions.DeleteAction;
+import actions.menuEditActions.NewRowAction;
+import actions.menuEditActions.SaveRowAction;
+import actions.menuFileActions.ExitAction;
+import actions.menuFileActions.NewFileAction;
+import actions.menuFileActions.SaveFileAction;
 
 public class AppWindow extends ApplicationWindow {
     Shell mainWindow;
@@ -46,8 +50,12 @@ public class AppWindow extends ApplicationWindow {
     Text textGroup;
     Button buttonSWTDone;
     int indexToRemove;
+    TableViewer viewer;
 
     Button buttonNew;
+    Button buttonSave;
+    Button buttonDelete;
+    Button buttonCancel;
     Session ses = SessionManager.getInstatnce();
     Entity newEntity;
 
@@ -97,40 +105,27 @@ public class AppWindow extends ApplicationWindow {
 	MenuManager mainMenu = new MenuManager();
 	MenuManager menuFile = new MenuManager("&File", "1");
 	mainMenu.add(menuFile);
-
+// File Menu
 	menuFile.add(new NewFileAction(this));
-	menuFile.add(new SaveAction(this));
 	menuFile.add(new Action("Open \tCtrl+O") {
 	});
-
+	menuFile.add(new SaveFileAction(this));
 	menuFile.add(new ExitAction(this));
 
-	// Edit Menu
+// Edit Menu
 	MenuManager menuEdit = new MenuManager("&Edit", "2");
 	mainMenu.add(menuEdit);
 
-	menuEdit.add(new Action("New row \tCtrl+R") {
+	menuEdit.add(new NewRowAction(this));
+	menuEdit.add(new SaveRowAction(this));
+	menuEdit.add(new DeleteAction(this));
+	menuEdit.add(new CancelAction(this));
+//Help Menu
+	MenuManager menuHelp = new MenuManager("&About", "3");
+	mainMenu.add(menuHelp);
+	menuHelp.add(new Action("Help \tF1") {
 	});
-
-	menuEdit.add(new Action("Save record \tCtrl+M") {
-	});
-
-	menuEdit.add(new Action("Delete record \tCtrl+D") {
-	});
-
-	menuEdit.add(new Action("Cancel \tCtrl+Q") {
-	});
-
-	menuEdit.add(new Action("Cancel \tCtrl+O") {
-//	    {
-//		System.out.println(ses);
-//		clearFields();
-//	    }
-	});
-
-	MenuManager menuAbout = new MenuManager("&About", "3");
-	mainMenu.add(menuAbout);
-	menuAbout.add(new Action("About program \tCtrl+F1") {
+	menuHelp.add(new Action("About program \tCtrl+F10") {
 	});
 
 	return mainMenu;
@@ -145,7 +140,7 @@ public class AppWindow extends ApplicationWindow {
 	// Start create Left part
 	Composite child1 = new Composite(form, SWT.BORDER);
 	child1.setLayout(new FillLayout());
-	TableViewer viewer = createTableViewer(child1);
+	viewer = createTableViewer(child1);
 
 	// Start create right part
 	Composite child2 = new Composite(form, SWT.BORDER);
@@ -164,7 +159,8 @@ public class AppWindow extends ApplicationWindow {
 	textName.addModifyListener(new ModifyListener() {
 	    @Override
 	    public void modifyText(ModifyEvent e) {
-		// Добавить затенение кнопки нью, валидацию
+		buttonSave.setEnabled(true);
+		buttonNew.setEnabled(true);
 	    }
 	});
 
@@ -174,6 +170,13 @@ public class AppWindow extends ApplicationWindow {
 
 	textGroup = new Text(child21, SWT.BORDER);
 	textGroup.setLayoutData(createGridForText());
+	textGroup.addModifyListener(new ModifyListener() {
+	    @Override
+	    public void modifyText(ModifyEvent e) {
+		buttonSave.setEnabled(true);
+		buttonNew.setEnabled(true);
+	    }
+	});
 
 	Label labelSWTDone = new Label(child21, SWT.NONE);
 	labelSWTDone.setText("SWT task is done?");
@@ -187,20 +190,17 @@ public class AppWindow extends ApplicationWindow {
 	    @Override
 	    public void handleEvent(Event event) {
 		// TODO
-		// if(ses.activeRecord.getSwtDone()==buttonSWTDone.)
+		buttonSave.setEnabled(true);
+		buttonNew.setEnabled(true);
 	    }
 	});
 
 	// Buttons
 	buttonNew = createButton(child21, "New", createGridForButtonNew());
 	buttonNew.addSelectionListener(new SelectionListener() {
-
 	    @Override
 	    public void widgetSelected(SelectionEvent e) {
-		if (newEntity == null) {
-		    clearFields();
-		    newEntity = new Entity();
-		}
+		newAction();
 	    }
 
 	    @Override
@@ -210,25 +210,11 @@ public class AppWindow extends ApplicationWindow {
 	    }
 	});
 
-	Button buttonSave = createButton(child21, "Save", createGridForButton());
+	buttonSave = createButton(child21, "Save", createGridForButton());
 	buttonSave.addSelectionListener(new SelectionListener() {
 	    @Override
 	    public void widgetSelected(SelectionEvent e) {
-		if (ses.activeRecord != null) {
-		    ses.name = textName.getText();
-		    ses.group = textGroup.getText();
-		    ses.swtDone = buttonSWTDone.getSelection();
-		    boolean answer = (ses.activeRecord.getName().equals(ses.name)
-			    && ses.activeRecord.getGroup().equals(ses.group)
-			    && ses.activeRecord.getSwtDone() == ses.swtDone);
-		    if (!answer) {
-			ses.addEntity(ses.name, ses.group, ses.swtDone);
-			viewer.refresh();
-			viewer.getTable().deselectAll();
-			clearFields();
-			buttonSave.setEnabled(false);
-		    }
-		}
+		saveRowAction();
 	    }
 
 	    @Override
@@ -238,14 +224,11 @@ public class AppWindow extends ApplicationWindow {
 	    }
 	});
 
-	Button buttonDelete = createButton(child21, "Delete", createGridForButton());
+	buttonDelete = createButton(child21, "Delete", createGridForButton());
 	buttonDelete.addSelectionListener(new SelectionListener() {
 	    @Override
 	    public void widgetSelected(SelectionEvent e) {
-		ses.removeCurrentObject();
-		viewer.getTable().deselectAll();
-		setFields();
-		viewer.refresh();
+		deleteAction();
 	    }
 
 	    @Override
@@ -253,7 +236,7 @@ public class AppWindow extends ApplicationWindow {
 	    }
 	});
 
-	Button buttonCancel = createButton(child21, "Cancel", createGridForButton());
+	buttonCancel = createButton(child21, "Cancel", createGridForButton());
 	buttonCancel.addSelectionListener(new SelectionListener() {
 	    @Override
 	    public void widgetSelected(SelectionEvent e) {
@@ -261,7 +244,7 @@ public class AppWindow extends ApplicationWindow {
 		clearFields();
 		viewer.refresh();
 		buttonSave.setEnabled(false);
-
+		buttonNew.setEnabled(false);
 	    }
 
 	    @Override
@@ -356,6 +339,8 @@ public class AppWindow extends ApplicationWindow {
 		ses.group = ses.activeRecord.getGroup();
 		ses.swtDone = ses.activeRecord.getSwtDone();
 		setFields();
+		buttonNew.setEnabled(false);
+		buttonSave.setEnabled(false);
 	    }
 	});
 	return viewer;
@@ -411,4 +396,53 @@ public class AppWindow extends ApplicationWindow {
 	ses.activeRecord = null;
 	setFields();
     }
+
+    public void deleteAction() {
+	ses.removeCurrentObject();
+	viewer.getTable().deselectAll();
+	setFields();
+	viewer.refresh();
+	buttonSave.setEnabled(false);
+	buttonNew.setEnabled(false);
+    }
+
+    public void newAction() {
+	if (ses.activeRecord != null) {
+	    ses.name = textName.getText();
+	    ses.group = textGroup.getText();
+	    ses.swtDone = buttonSWTDone.getSelection();
+	    boolean answer = (ses.activeRecord.getName().equals(ses.name)
+		    && ses.activeRecord.getGroup().equals(ses.group) && ses.activeRecord.getSwtDone() == ses.swtDone);
+	    if (!answer) {
+		ses.addEntity(ses.name, ses.group, ses.swtDone);
+		viewer.refresh();
+		viewer.getTable().deselectAll();
+		clearFields();
+		buttonSave.setEnabled(false);
+		buttonNew.setEnabled(false);
+	    }
+	}
+    }
+
+    public void saveRowAction() {
+	if (ses.activeRecord != null) {
+	    ses.name = textName.getText();
+	    ses.group = textGroup.getText();
+	    ses.swtDone = buttonSWTDone.getSelection();
+	    boolean answer = (ses.activeRecord.getName().equals(ses.name)
+		    && ses.activeRecord.getGroup().equals(ses.group) && ses.activeRecord.getSwtDone() == ses.swtDone);
+	    if (!answer) {
+		ses.activeRecord.setName(ses.name);
+		ses.activeRecord.setGroup(ses.group);
+		ses.activeRecord.setSwtDone(ses.swtDone);
+
+		viewer.refresh();
+		viewer.getTable().deselectAll();
+		clearFields();
+		buttonSave.setEnabled(false);
+		buttonNew.setEnabled(false);
+	    }
+	}
+    }
+
 }
