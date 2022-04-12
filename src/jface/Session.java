@@ -10,7 +10,7 @@ public class Session {
     public boolean swtDone;
     public Entity activeRecord;
     public String fileName;
-    public String fileType;
+    // public String fileType;
 
     public Session() {
 	this.unsavedRecords = new ArrayList<>();
@@ -34,13 +34,14 @@ public class Session {
 
 // Others
     public void clear() {
+	this.unsavedRecords = null;
 	this.unsavedRecords = new ArrayList<>();
 	this.name = "";
 	this.group = "";
 	this.swtDone = false;
 	this.activeRecord = null;
 	this.fileName = "";
-	this.fileType = "";
+	// this.fileType = "";
     }
 
     public void removeCurrentObject() {

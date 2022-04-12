@@ -15,6 +15,6 @@ public class NewRowAction extends Action {
     }
 
     public void run() {
-	_window.newAction();
+	_window.newRecordAction();
     }
 }

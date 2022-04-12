@@ -1,19 +1,20 @@
 package actions.menuFileActions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.window.ApplicationWindow;
+
+import jface.AppWindow;
+import savers.FileSaveManager;
 
 public class SaveFileAction extends Action {
-    ApplicationWindow _window;
+    AppWindow _window;
 
-    public SaveFileAction(ApplicationWindow window) {
+    public SaveFileAction(AppWindow window) {
 	_window = window;
-	setText("Cancel \tCtrl+S");
-	setToolTipText("Cancel editing record");
-
+	setText("Save file \tCtrl+S");
+	setToolTipText("Save file");
     }
 
     public void run() {
-
+	FileSaveManager.execute(_window);
     }
 }

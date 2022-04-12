@@ -42,6 +42,8 @@ import actions.menuEditActions.SaveRowAction;
 import actions.menuFileActions.ExitAction;
 import actions.menuFileActions.NewFileAction;
 import actions.menuFileActions.SaveFileAction;
+import actions.menuHelpActions.AboutAction;
+import actions.menuHelpActions.HelpAction;
 
 public class AppWindow extends ApplicationWindow {
     Shell mainWindow;
@@ -123,10 +125,8 @@ public class AppWindow extends ApplicationWindow {
 //Help Menu
 	MenuManager menuHelp = new MenuManager("&About", "3");
 	mainMenu.add(menuHelp);
-	menuHelp.add(new Action("Help \tF1") {
-	});
-	menuHelp.add(new Action("About program \tCtrl+F10") {
-	});
+	menuHelp.add(new HelpAction(this));
+	menuHelp.add(new AboutAction(this));
 
 	return mainMenu;
     }
@@ -200,7 +200,7 @@ public class AppWindow extends ApplicationWindow {
 	buttonNew.addSelectionListener(new SelectionListener() {
 	    @Override
 	    public void widgetSelected(SelectionEvent e) {
-		newAction();
+		newRecordAction();
 	    }
 
 	    @Override
@@ -242,7 +242,6 @@ public class AppWindow extends ApplicationWindow {
 	    public void widgetSelected(SelectionEvent e) {
 		viewer.getTable().deselectAll();
 		clearFields();
-		viewer.refresh();
 		buttonSave.setEnabled(false);
 		buttonNew.setEnabled(false);
 	    }
@@ -382,11 +381,9 @@ public class AppWindow extends ApplicationWindow {
 
     private void setFields() {
 	textName.setText(ses.name);
-	textName.redraw();
 	textGroup.setText(ses.group);
-	textGroup.redraw();
 	buttonSWTDone.setSelection(ses.swtDone);
-	buttonSWTDone.redraw();
+	redrawAll();
     }
 
     public void clearFields() {
@@ -397,16 +394,7 @@ public class AppWindow extends ApplicationWindow {
 	setFields();
     }
 
-    public void deleteAction() {
-	ses.removeCurrentObject();
-	viewer.getTable().deselectAll();
-	setFields();
-	viewer.refresh();
-	buttonSave.setEnabled(false);
-	buttonNew.setEnabled(false);
-    }
-
-    public void newAction() {
+    public void newRecordAction() {
 	if (ses.activeRecord != null) {
 	    ses.name = textName.getText();
 	    ses.group = textGroup.getText();
@@ -436,7 +424,6 @@ public class AppWindow extends ApplicationWindow {
 		ses.activeRecord.setGroup(ses.group);
 		ses.activeRecord.setSwtDone(ses.swtDone);
 
-		viewer.refresh();
 		viewer.getTable().deselectAll();
 		clearFields();
 		buttonSave.setEnabled(false);
@@ -445,4 +432,20 @@ public class AppWindow extends ApplicationWindow {
 	}
     }
 
+    public void deleteAction() {
+	ses.removeCurrentObject();
+	viewer.getTable().deselectAll();
+	setFields();
+	redrawAll();
+	// viewer.refresh();
+	buttonSave.setEnabled(false);
+	buttonNew.setEnabled(false);
+    }
+
+    public void redrawAll() {
+	textName.redraw();
+	textGroup.redraw();
+	buttonSWTDone.redraw();
+	viewer.refresh();
+    }
 }

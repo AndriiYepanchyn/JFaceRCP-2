@@ -26,4 +26,8 @@ public class SessionManager {
 	// TODO UNDONE
 	return null;
     }
+
+    public static synchronized void clearSession() {
+	session = null;
+    }
 }

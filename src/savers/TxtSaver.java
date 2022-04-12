@@ -15,14 +15,13 @@ import com.google.gson.Gson;
 
 import jface.Entity;
 
-public class JsonSaver implements Savable {
+public class TxtSaver implements Savable {
 
     @Override
     public boolean saveToFile(ArrayList<Entity> unsavedRecords, String fileName) {
 	boolean answer = false;
-	Gson toGson = new Gson();
-	// Gson toGson = new GsonBuilder().create();
-	String outputString = toGson.toJson(unsavedRecords);
+	String outputString = unsavedRecords.toString();
+	System.out.println("output string: \n" + outputString);
 	File myFile = new File(fileName);
 	try {
 	    @SuppressWarnings("resource")
