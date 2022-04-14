@@ -2,7 +2,6 @@ package jface;
 
 import java.lang.reflect.Method;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -41,6 +40,7 @@ import actions.menuEditActions.NewRowAction;
 import actions.menuEditActions.SaveRowAction;
 import actions.menuFileActions.ExitAction;
 import actions.menuFileActions.NewFileAction;
+import actions.menuFileActions.OpenFileAction;
 import actions.menuFileActions.SaveFileAction;
 import actions.menuHelpActions.AboutAction;
 import actions.menuHelpActions.HelpAction;
@@ -109,8 +109,7 @@ public class AppWindow extends ApplicationWindow {
 	mainMenu.add(menuFile);
 // File Menu
 	menuFile.add(new NewFileAction(this));
-	menuFile.add(new Action("Open \tCtrl+O") {
-	});
+	menuFile.add(new OpenFileAction(this));
 	menuFile.add(new SaveFileAction(this));
 	menuFile.add(new ExitAction(this));
 
@@ -437,7 +436,6 @@ public class AppWindow extends ApplicationWindow {
 	viewer.getTable().deselectAll();
 	setFields();
 	redrawAll();
-	// viewer.refresh();
 	buttonSave.setEnabled(false);
 	buttonNew.setEnabled(false);
     }
@@ -447,5 +445,15 @@ public class AppWindow extends ApplicationWindow {
 	textGroup.redraw();
 	buttonSWTDone.redraw();
 	viewer.refresh();
+	// viewer.getTable().clearAll();
+    }
+
+    public void reassignTableInput() {
+	viewer.setInput(ses.unsavedRecords);
+    }
+
+    public void clearSession() {
+	viewer.getTable().deselectAll();
+	ses.clear();
     }
 }

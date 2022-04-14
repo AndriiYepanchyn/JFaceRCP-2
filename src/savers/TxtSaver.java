@@ -11,8 +11,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import com.google.gson.Gson;
-
 import jface.Entity;
 
 public class TxtSaver implements Savable {
@@ -21,7 +19,7 @@ public class TxtSaver implements Savable {
     public boolean saveToFile(ArrayList<Entity> unsavedRecords, String fileName) {
 	boolean answer = false;
 	String outputString = unsavedRecords.toString();
-	System.out.println("output string: \n" + outputString);
+	// System.out.println("output string: \n" + outputString);
 	File myFile = new File(fileName);
 	try {
 	    @SuppressWarnings("resource")
@@ -39,29 +37,50 @@ public class TxtSaver implements Savable {
 
     @Override
     public ArrayList<Entity> readFromFile(String fileName) {
-	StringBuilder out = new StringBuilder();
+	ArrayList<Entity> out = new ArrayList<>();
 	try {
 	    File file = new File(fileName);
 	    FileReader reader = new FileReader(file);
 	    Scanner scanner = new Scanner(reader);
 	    while (scanner.hasNextLine()) {
-		out.append(scanner.nextLine());
+		String tmpString = scanner.nextLine();
+		Entity tmp = additiveToOut(tmpString);
+		if (tmp != null)
+		    out.add(tmp);
 	    }
-	    reader.close();
 	    scanner.close();
-
+	    reader.close();
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}
-	Gson gson = new Gson();
-	// ArrayList<Entity> answer = new ArrayList<>();
-	// TODO UNDONE
-//	{
-//	Type type = new TypeToken<Map<String, Integer>>(){}.getType();
-//	answer=gson.fromJson(out.toString(), ArrayList<Entity>.getClass());
-//	}
-	return null;
+	return out;
 
     }
 
+    private Entity additiveToOut(String tmp) {
+	if (tmp.contains("name=") && tmp.contains("group=") && tmp.contains("swtDone=")) {
+	    String name, group;
+	    boolean swtDone;
+	    Entity record;
+	    int startNameIndex, endNameIndex;
+	    int startGroupIndex, endGroupIndex;
+	    int startSWTIndex, endSWTIndex;
+	    startNameIndex = tmp.indexOf("name=");
+	    endNameIndex = tmp.indexOf(";");
+	    startGroupIndex = tmp.indexOf("group=");
+	    endGroupIndex = tmp.indexOf(";", startGroupIndex);
+	    startSWTIndex = tmp.indexOf("swtDone=");
+	    name = tmp.substring(startNameIndex, endNameIndex).replaceFirst("name=", "");
+	    group = tmp.substring(startGroupIndex, endGroupIndex).replaceFirst("group=", "");
+	    if (tmp.substring(startSWTIndex).replaceFirst("swtDone=", "").contains("true")) {
+		swtDone = true;
+	    } else {
+		swtDone = false;
+	    }
+	    record = new Entity(name, group, swtDone);
+	    return record;
+	} else
+	    return null;
+
+    }
 }

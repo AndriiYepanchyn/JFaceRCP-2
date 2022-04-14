@@ -2,15 +2,19 @@ package savers;
 
 import static jface.SessionManager.getInstatnce;
 
+import java.io.File;
+import java.util.ArrayList;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.MessageBox;
 
 import jface.AppWindow;
+import jface.Entity;
 
-public class FileSaveManager {
+public class FileReadManager {
+    ArrayList<Entity> recordsToLoadArrayList = new ArrayList<>();
+    StringBuilder inputString = new StringBuilder();
     private static final String[] FILTER_NAMES = { "JSON Files (*.json)", "Plain text (*.txt)", "All Files (*.*)" };
-
     // These filter extensions are used to filter which files are displayed.
     private static final String[] FILTER_EXTS = { "*.json", "*.txt", "*.*" };
 
@@ -18,31 +22,31 @@ public class FileSaveManager {
 
     public static void execute(AppWindow inWindow) {
 	window = inWindow;
-
 	getInstatnce().fileName = chooseFile();
-	if (getInstatnce().fileName == null || getInstatnce().fileName.equals("")) {// choose file
-	    Savable fileData = selectSaver(getInstatnce().fileName);
-	    fileData.saveToFile(getInstatnce().unsavedRecords, getInstatnce().fileName);
-	}
+	Savable fileData = selectSaver(getInstatnce().fileName);
 
+	System.out.println("Instance was");
+	System.out.println(getInstatnce().unsavedRecords);
+
+	getInstatnce().unsavedRecords = fileData.readFromFile(getInstatnce().fileName);
+	System.out.println("start print new instance ");
+	System.out.println(getInstatnce().unsavedRecords);
     }
 
     private static String chooseFile() {
 	String fileName = "";
-	FileDialog dlg = new FileDialog(window.getShell(), SWT.SAVE);
+	FileDialog dlg = new FileDialog(window.getShell(), SWT.OPEN);
 	dlg.setFilterNames(FILTER_NAMES);
 	dlg.setFilterExtensions(FILTER_EXTS);
 	fileName = dlg.open();
-	if (fileName == null) {
-	    // Errorbox
-	    MessageBox incorrectFileDialogBox = new MessageBox(window.getShell(), SWT.OK);
-	    incorrectFileDialogBox.setMessage("There wasn't correct file name entered");
-	    incorrectFileDialogBox.setText("Incorrect file name");
-	    int answer = incorrectFileDialogBox.open();
-	    fileName = "";
+	if (fileName != null && !fileName.equals("")) {
+	    File inputFile = new File(fileName);
+	    if (inputFile.exists() && inputFile.canRead()) {
+	    } else {
+		fileName = "";
+	    }
 	}
-
-	System.out.println("Input filename: " + fileName);
+	// TODO PRocess answer cancel
 	return fileName;
     }
 
@@ -60,7 +64,6 @@ public class FileSaveManager {
 	    System.out.println("Incorrect file type");
 	    return null;
 	}
-
     }
 
 }

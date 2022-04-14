@@ -86,6 +86,6 @@ public class Entity {
 
     @Override
     public String toString() {
-	return "Entity [name=" + name + ", group=" + group + ", swtDone=" + swtDone + "]";
+	return "[name=" + name + "; group=" + group + "; swtDone=" + swtDone + ";]\n";
     }
 }

@@ -8,10 +8,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import jface.Entity;
 
@@ -20,8 +23,7 @@ public class JsonSaver implements Savable {
     @Override
     public boolean saveToFile(ArrayList<Entity> unsavedRecords, String fileName) {
 	boolean answer = false;
-	Gson toGson = new Gson();
-	// Gson toGson = new GsonBuilder().create();
+	Gson toGson = new GsonBuilder().setPrettyPrinting().create();
 	String outputString = toGson.toJson(unsavedRecords);
 	File myFile = new File(fileName);
 	try {
@@ -40,6 +42,7 @@ public class JsonSaver implements Savable {
 
     @Override
     public ArrayList<Entity> readFromFile(String fileName) {
+	// Get string from file
 	StringBuilder out = new StringBuilder();
 	try {
 	    File file = new File(fileName);
@@ -50,19 +53,24 @@ public class JsonSaver implements Savable {
 	    }
 	    reader.close();
 	    scanner.close();
-
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}
-	Gson gson = new Gson();
-	// ArrayList<Entity> answer = new ArrayList<>();
-	// TODO UNDONE
-//	{
-//	Type type = new TypeToken<Map<String, Integer>>(){}.getType();
-//	answer=gson.fromJson(out.toString(), ArrayList<Entity>.getClass());
-//	}
-	return null;
 
+	System.out.println("String got from file is\n" + out);
+	// Start convert JSON
+	ArrayList<Entity> answer = new ArrayList<>();
+	if (out != null && !out.equals("")) {
+	    Gson gson = new Gson();
+	    Type type = new TypeToken<ArrayList<Entity>>() {
+	    }.getType();
+	    answer = gson.fromJson(out.toString(), type);
+	} else {
+	    answer = null;
+	}
+
+	System.out.println("Answer is\n" + answer);
+	return answer;
     }
 
 }

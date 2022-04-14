@@ -17,8 +17,10 @@ public class NewFileAction extends Action {
 
     public void run() {
 	System.out.println("was: " + SessionManager.getInstatnce().unsavedRecords);
-	SessionManager.clearSession();
+	_window.clearSession();
 	System.out.println("became: " + SessionManager.getInstatnce().unsavedRecords);
+	_window.clearFields();
+	_window.reassignTableInput();
 	_window.redrawAll();
 	System.out.println("New File");
     }

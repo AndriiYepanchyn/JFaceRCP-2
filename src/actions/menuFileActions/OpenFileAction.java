@@ -3,19 +3,19 @@ package actions.menuFileActions;
 import org.eclipse.jface.action.Action;
 
 import jface.AppWindow;
-import savers.FileSaveManager;
+import savers.FileReadManager;
 
-public class SaveFileAction extends Action {
+public class OpenFileAction extends Action {
     AppWindow _window;
 
-    public SaveFileAction(AppWindow window) {
+    public OpenFileAction(AppWindow window) {
 	_window = window;
-	setText("Save file \tCtrl+S");
-	setToolTipText("Save file");
+	setText("Open file \tCtrl+O");
+	setToolTipText("Open file");
     }
 
     public void run() {
-	FileSaveManager.execute(_window);
+	FileReadManager.execute(_window);
 	_window.reassignTableInput();
 	_window.redrawAll();
     }
