@@ -1,7 +1,5 @@
 package jface;
 
-import java.util.ArrayList;
-
 public class SessionManager {
     private static Session session;
 
@@ -14,20 +12,5 @@ public class SessionManager {
 
     private SessionManager() {
 	session = new Session();
-    }
-
-    public boolean saveSessionToFile() {
-	// TODO UNDONE
-	System.out.println("Session saved");
-	return true;
-    }
-
-    ArrayList<Entity> readFromFile(String fileName) {
-	// TODO UNDONE
-	return null;
-    }
-
-    public static synchronized void clearSession() {
-	session = null;
     }
 }

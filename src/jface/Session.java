@@ -34,15 +34,11 @@ public class Session {
 // Others
     public void clear() {
 	this.unsavedRecords.clear();
-	;
-//	this.unsavedRecords.removeAll(unsavedRecords);
-	// this.unsavedRecords = new ArrayList<>();
 	this.name = "";
 	this.group = "";
 	this.swtDone = false;
 	this.activeRecord = null;
 	this.fileName = "";
-	// this.fileType = "";
     }
 
     public void removeCurrentObject() {
@@ -59,8 +55,8 @@ public class Session {
     public String toString() {
 	StringBuilder answer = new StringBuilder();
 	for (Entity s : unsavedRecords) {
-	    answer.append("Entity: (" + s + ") Name: " + s.getName() + ", group: " + s.getGroup() + ", SWT Done: "
-		    + s.getSwtDone() + "\n");
+	    answer.append(
+		    "(Name: " + s.getName() + ", group: " + s.getGroup() + ", SWT Done: " + s.getSwtDone() + ")\n");
 	}
 	return answer.toString();
     }

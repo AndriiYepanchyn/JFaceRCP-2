@@ -2,6 +2,9 @@ package savers;
 
 import static jface.SessionManager.getInstatnce;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
@@ -16,15 +19,31 @@ public class FileSaveManager {
 
     private static AppWindow window;
 
-    public static void execute(AppWindow inWindow) {
-	window = inWindow;
+    // SaveWithConfirmationOfFileName = true - ask file name in DialogBox, = false
+    // use fileName saved in session
+    public static void execute(AppWindow inWindow, boolean SaveWithFileSelection) {
 
-	getInstatnce().fileName = chooseFile();
-	if (getInstatnce().fileName == null || getInstatnce().fileName.equals("")) {// choose file
+	window = inWindow;
+	String tempFileName;
+	if (SaveWithFileSelection) {
+	    tempFileName = chooseFile();
+	} else {
+	    tempFileName = getInstatnce().fileName;
+	    if (!isFileNameCorrect(tempFileName)) {
+		FileSaveManager.execute(inWindow, true);
+	    }
+	}
+	if (isFileNameCorrect(tempFileName)) {
+	    getInstatnce().fileName = tempFileName;
 	    Savable fileData = selectSaver(getInstatnce().fileName);
 	    fileData.saveToFile(getInstatnce().unsavedRecords, getInstatnce().fileName);
+	} else {
+	    // Errorbox
+	    MessageBox incorrectFileDialogBox = new MessageBox(window.getShell(), SWT.OK);
+	    incorrectFileDialogBox.setMessage("There wasn't correct file name entered");
+	    incorrectFileDialogBox.setText("WARNING! File wasn't saved");
+	    int answer = incorrectFileDialogBox.open();
 	}
-
     }
 
     private static String chooseFile() {
@@ -34,15 +53,8 @@ public class FileSaveManager {
 	dlg.setFilterExtensions(FILTER_EXTS);
 	fileName = dlg.open();
 	if (fileName == null) {
-	    // Errorbox
-	    MessageBox incorrectFileDialogBox = new MessageBox(window.getShell(), SWT.OK);
-	    incorrectFileDialogBox.setMessage("There wasn't correct file name entered");
-	    incorrectFileDialogBox.setText("Incorrect file name");
-	    int answer = incorrectFileDialogBox.open();
 	    fileName = "";
 	}
-
-	System.out.println("Input filename: " + fileName);
 	return fileName;
     }
 
@@ -51,16 +63,29 @@ public class FileSaveManager {
 	String extenstion = filename.substring(start + 1).toUpperCase();
 	switch (extenstion) {
 	case "JSON":
-	    System.out.println("JSON TYPE Selected");
 	    return new JsonSaver();
 	case "TXT":
-	    System.out.println("TXT type selected");
 	    return new TxtSaver();
 	default:
 	    System.out.println("Incorrect file type");
 	    return null;
 	}
-
     }
 
+    private static boolean isFileNameCorrect(String fileName) {
+	if (fileName != null && fileName.length() > 0) {
+	    File f = new File(fileName);
+	    try {
+		if (f.exists() || (f.createNewFile()) && f.canWrite()) {
+		    return true;
+		} else
+		    return false;
+	    } catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+		return false;
+	    }
+	} else
+	    return false;
+    }
 }

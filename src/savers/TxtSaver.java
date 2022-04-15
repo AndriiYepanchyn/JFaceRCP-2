@@ -19,7 +19,6 @@ public class TxtSaver implements Savable {
     public boolean saveToFile(ArrayList<Entity> unsavedRecords, String fileName) {
 	boolean answer = false;
 	String outputString = unsavedRecords.toString();
-	// System.out.println("output string: \n" + outputString);
 	File myFile = new File(fileName);
 	try {
 	    @SuppressWarnings("resource")

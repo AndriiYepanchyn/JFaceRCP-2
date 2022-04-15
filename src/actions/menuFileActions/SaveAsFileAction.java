@@ -3,20 +3,19 @@ package actions.menuFileActions;
 import org.eclipse.jface.action.Action;
 
 import jface.AppWindow;
+import savers.FileSaveManager;
 
-public class NewFileAction extends Action {
+public class SaveAsFileAction extends Action {
     AppWindow _window;
 
-    public NewFileAction(AppWindow window) {
+    public SaveAsFileAction(AppWindow window) {
 	_window = window;
-	setText("New File \tCtrl+N");
-	setToolTipText("New File");
-
+	setText("File save as \tCtrl+F");
+	setToolTipText("File save as");
     }
 
     public void run() {
-	_window.clearSession();
-	_window.clearFields();
+	FileSaveManager.execute(_window, true);
 	_window.reassignTableInput();
 	_window.redrawAll();
     }

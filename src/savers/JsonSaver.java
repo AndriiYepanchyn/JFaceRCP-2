@@ -57,7 +57,6 @@ public class JsonSaver implements Savable {
 	    e.printStackTrace();
 	}
 
-	System.out.println("String got from file is\n" + out);
 	// Start convert JSON
 	ArrayList<Entity> answer = new ArrayList<>();
 	if (out != null && !out.equals("")) {
@@ -68,8 +67,6 @@ public class JsonSaver implements Savable {
 	} else {
 	    answer = null;
 	}
-
-	System.out.println("Answer is\n" + answer);
 	return answer;
     }
 

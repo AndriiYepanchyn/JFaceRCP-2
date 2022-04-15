@@ -11,11 +11,11 @@ public class SaveFileAction extends Action {
     public SaveFileAction(AppWindow window) {
 	_window = window;
 	setText("Save file \tCtrl+S");
-	setToolTipText("Save file");
+	setToolTipText("Save File");
     }
 
     public void run() {
-	FileSaveManager.execute(_window);
+	FileSaveManager.execute(_window, false);
 	_window.reassignTableInput();
 	_window.redrawAll();
     }

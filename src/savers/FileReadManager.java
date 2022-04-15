@@ -22,15 +22,12 @@ public class FileReadManager {
 
     public static void execute(AppWindow inWindow) {
 	window = inWindow;
-	getInstatnce().fileName = chooseFile();
-	Savable fileData = selectSaver(getInstatnce().fileName);
-
-	System.out.println("Instance was");
-	System.out.println(getInstatnce().unsavedRecords);
-
-	getInstatnce().unsavedRecords = fileData.readFromFile(getInstatnce().fileName);
-	System.out.println("start print new instance ");
-	System.out.println(getInstatnce().unsavedRecords);
+	String tempFileName = chooseFile();
+	if (tempFileName != null && !tempFileName.equals("")) {
+	    getInstatnce().fileName = tempFileName;
+	    Savable fileData = selectSaver(getInstatnce().fileName);
+	    getInstatnce().unsavedRecords = fileData.readFromFile(getInstatnce().fileName);
+	}
     }
 
     private static String chooseFile() {
@@ -41,24 +38,23 @@ public class FileReadManager {
 	fileName = dlg.open();
 	if (fileName != null && !fileName.equals("")) {
 	    File inputFile = new File(fileName);
-	    if (inputFile.exists() && inputFile.canRead()) {
-	    } else {
+	    if (!inputFile.exists() || !inputFile.canRead()) {
 		fileName = "";
 	    }
 	}
-	// TODO PRocess answer cancel
 	return fileName;
     }
 
     private static Savable selectSaver(String filename) {
+	// System.out.println("file" + filename);
 	int start = filename.lastIndexOf(".");
 	String extenstion = filename.substring(start + 1).toUpperCase();
 	switch (extenstion) {
 	case "JSON":
-	    System.out.println("JSON TYPE Selected");
+	    // System.out.println("JSON TYPE Selected");
 	    return new JsonSaver();
 	case "TXT":
-	    System.out.println("TXT type selected");
+	    // System.out.println("TXT type selected");
 	    return new TxtSaver();
 	default:
 	    System.out.println("Incorrect file type");

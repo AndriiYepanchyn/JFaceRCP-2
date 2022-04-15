@@ -41,6 +41,7 @@ import actions.menuEditActions.SaveRowAction;
 import actions.menuFileActions.ExitAction;
 import actions.menuFileActions.NewFileAction;
 import actions.menuFileActions.OpenFileAction;
+import actions.menuFileActions.SaveAsFileAction;
 import actions.menuFileActions.SaveFileAction;
 import actions.menuHelpActions.AboutAction;
 import actions.menuHelpActions.HelpAction;
@@ -63,13 +64,12 @@ public class AppWindow extends ApplicationWindow {
 
     public AppWindow() {
 	super(null);
-
-	ses.addEntity("name 1", "1", true);
-	ses.addEntity("name 2", "2", false);
-	ses.addEntity("name 3", "1", true);
-	ses.addEntity("name 4", "2", false);
-	ses.addEntity("name 5", "1", false);
-	ses.addEntity("name 6", "2", true);
+//	ses.addEntity("name 1", "1", true);
+//	ses.addEntity("name 2", "2", false);
+//	ses.addEntity("name 3", "1", true);
+//	ses.addEntity("name 4", "2", false);
+//	ses.addEntity("name 5", "1", false);
+//	ses.addEntity("name 6", "2", true);
 	addMenuBar();
     }
 
@@ -110,6 +110,7 @@ public class AppWindow extends ApplicationWindow {
 // File Menu
 	menuFile.add(new NewFileAction(this));
 	menuFile.add(new OpenFileAction(this));
+	menuFile.add(new SaveAsFileAction(this));
 	menuFile.add(new SaveFileAction(this));
 	menuFile.add(new ExitAction(this));
 
@@ -185,10 +186,8 @@ public class AppWindow extends ApplicationWindow {
 	buttonSWTDone.setSelection(false);
 	buttonSWTDone.setLayoutData(createGridForText());
 	buttonSWTDone.addListener(SWT.Selection, new Listener() {
-
 	    @Override
 	    public void handleEvent(Event event) {
-		// TODO
 		buttonSave.setEnabled(true);
 		buttonNew.setEnabled(true);
 	    }
@@ -204,8 +203,6 @@ public class AppWindow extends ApplicationWindow {
 
 	    @Override
 	    public void widgetDefaultSelected(SelectionEvent e) {
-		// TODO Auto-generated method stub
-
 	    }
 	});
 
@@ -236,6 +233,7 @@ public class AppWindow extends ApplicationWindow {
 	});
 
 	buttonCancel = createButton(child21, "Cancel", createGridForButton());
+	buttonCancel.setEnabled(true);
 	buttonCancel.addSelectionListener(new SelectionListener() {
 	    @Override
 	    public void widgetSelected(SelectionEvent e) {
@@ -308,7 +306,7 @@ public class AppWindow extends ApplicationWindow {
 	Button button = new Button(parent, SWT.PUSH);
 	button.setLayoutData(buttonGridData);
 	button.setText(text);
-
+	button.setEnabled(false);
 	return button;
     }
 
@@ -339,6 +337,7 @@ public class AppWindow extends ApplicationWindow {
 		setFields();
 		buttonNew.setEnabled(false);
 		buttonSave.setEnabled(false);
+		buttonDelete.setEnabled(true);
 	    }
 	});
 	return viewer;
@@ -394,6 +393,7 @@ public class AppWindow extends ApplicationWindow {
     }
 
     public void newRecordAction() {
+	ifNewTableStarted();
 	if (ses.activeRecord != null) {
 	    ses.name = textName.getText();
 	    ses.group = textGroup.getText();
@@ -402,16 +402,17 @@ public class AppWindow extends ApplicationWindow {
 		    && ses.activeRecord.getGroup().equals(ses.group) && ses.activeRecord.getSwtDone() == ses.swtDone);
 	    if (!answer) {
 		ses.addEntity(ses.name, ses.group, ses.swtDone);
-		viewer.refresh();
-		viewer.getTable().deselectAll();
-		clearFields();
-		buttonSave.setEnabled(false);
-		buttonNew.setEnabled(false);
 	    }
+	    viewer.refresh();
+	    viewer.getTable().deselectAll();
+	    clearFields();
+	    buttonSave.setEnabled(false);
+	    buttonNew.setEnabled(false);
 	}
     }
 
     public void saveRowAction() {
+	ifNewTableStarted();
 	if (ses.activeRecord != null) {
 	    ses.name = textName.getText();
 	    ses.group = textGroup.getText();
@@ -422,12 +423,11 @@ public class AppWindow extends ApplicationWindow {
 		ses.activeRecord.setName(ses.name);
 		ses.activeRecord.setGroup(ses.group);
 		ses.activeRecord.setSwtDone(ses.swtDone);
-
-		viewer.getTable().deselectAll();
-		clearFields();
-		buttonSave.setEnabled(false);
-		buttonNew.setEnabled(false);
 	    }
+	    viewer.getTable().deselectAll();
+	    clearFields();
+	    buttonSave.setEnabled(false);
+	    buttonNew.setEnabled(false);
 	}
     }
 
@@ -445,7 +445,6 @@ public class AppWindow extends ApplicationWindow {
 	textGroup.redraw();
 	buttonSWTDone.redraw();
 	viewer.refresh();
-	// viewer.getTable().clearAll();
     }
 
     public void reassignTableInput() {
@@ -455,5 +454,17 @@ public class AppWindow extends ApplicationWindow {
     public void clearSession() {
 	viewer.getTable().deselectAll();
 	ses.clear();
+	buttonSave.setEnabled(false);
+	buttonNew.setEnabled(false);
     }
+
+    private void ifNewTableStarted() {
+	if (ses.unsavedRecords.size() == 0) {
+	    Entity newEntity = new Entity(textName.getText(), textGroup.getText(), buttonSWTDone.getSelection());
+	    ses.addEntity(newEntity);
+	    ses.activeRecord = ses.unsavedRecords.get(0);
+	    newEntity = null;
+	}
+    }
+
 }
