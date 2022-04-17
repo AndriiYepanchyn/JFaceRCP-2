@@ -42,25 +42,25 @@ public class Entity {
 	this.swtDone = swtDone;
     }
 
-    public static String[] getArrayOfEntityFields() {
-	Field[] fieldsArrFields = null;
+    public static String[] getFieldsNames() {
+	Field[] fields = null;
 	Entity entity = new Entity();
-
+	String[] fieldNames = null;
 	try {
-	    fieldsArrFields = entity.getClass().getDeclaredFields();
+	    fields = entity.getClass().getDeclaredFields();
+	    fieldNames = new String[fields.length];
+	    for (int i = 0; i < fields.length; i++) {
+		fieldNames[i] = fields[i].getName();
+	    }
 	} catch (Exception e) {
 	    e.printStackTrace();
-	}
-	String[] fieldNames = new String[fieldsArrFields.length];
-	for (int i = 0; i < fieldsArrFields.length; i++) {
-	    fieldNames[i] = fieldsArrFields[i].getName();
 	}
 	return fieldNames;
     }
 
     public static HashMap<String, Method> getRefferedMethods() {
-	HashMap<String, Method> methodAssosiations = new HashMap();
-	String[] methodNames = Entity.getArrayOfEntityFields();
+	HashMap<String, Method> methodAssosiations = new HashMap<String, Method>();
+	String[] methodNames = Entity.getFieldsNames();
 	int len = methodNames.length;
 	Method[] methods = new Method[len];
 	@SuppressWarnings("rawtypes")
@@ -71,6 +71,7 @@ public class Entity {
 	    for (int i = 0; i < len; i++) {
 		String firString = String.valueOf(methodNames[i].charAt(0));
 		String metString = "get" + methodNames[i].replaceFirst(firString, firString.toUpperCase());
+		@SuppressWarnings("unchecked")
 		Method tmpMethod = entityClass.getDeclaredMethod(metString);
 		if (tmpMethod == null) {
 		    System.out.println("Error in getting method " + metString);

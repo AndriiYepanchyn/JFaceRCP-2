@@ -10,6 +10,7 @@ public class Session {
     public boolean swtDone;
     public Entity activeRecord;
     public String fileName;
+    public boolean isNewFile;
 
     public Session() {
 	this.unsavedRecords = new ArrayList<>();
@@ -17,10 +18,11 @@ public class Session {
 	this.group = "";
 	this.swtDone = false;
 	this.activeRecord = null;
+	this.isNewFile = true;
     }
 
-    public void addEntity(String tmpname, String tmpgroup, boolean swtDone) {
-	this.unsavedRecords.add(new Entity(tmpname, tmpgroup, swtDone));
+    public void addEntity(String tmpName, String tmpGroup, boolean swtDone) {
+	this.unsavedRecords.add(new Entity(tmpName, tmpGroup, swtDone));
     }
 
     public void addEntity(Entity e) {
@@ -39,6 +41,7 @@ public class Session {
 	this.swtDone = false;
 	this.activeRecord = null;
 	this.fileName = "";
+	this.isNewFile = true;
     }
 
     public void removeCurrentObject() {

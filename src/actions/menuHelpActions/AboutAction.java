@@ -12,7 +12,6 @@ public class AboutAction extends Action {
 	_window = window;
 	setText("About program \tCtrl+F10");
 	setToolTipText("About program");
-	// setImageDescriptor(greenImageDesc);
     }
 
     public void run() {
@@ -21,7 +20,6 @@ public class AboutAction extends Action {
 	MessageBox aboutMessageBox = new MessageBox(_window.getShell(), SWT.OK);
 	aboutMessageBox.setMessage(helpString);
 	aboutMessageBox.setText("About program");
-	int answer = aboutMessageBox.open();
-
+	aboutMessageBox.open();
     }
 }

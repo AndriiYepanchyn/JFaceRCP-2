@@ -3,6 +3,7 @@ package actions.menuFileActions;
 import org.eclipse.jface.action.Action;
 
 import jface.AppWindow;
+import jface.SessionManager;
 import savers.FileReadManager;
 
 public class OpenFileAction extends Action {
@@ -16,6 +17,7 @@ public class OpenFileAction extends Action {
 
     public void run() {
 	FileReadManager.execute(_window);
+	_window.getShell().setText("JFace application:  " + SessionManager.getSession().fileName);
 	_window.reassignTableInput();
 	_window.redrawAll();
     }

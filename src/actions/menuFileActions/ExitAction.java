@@ -12,7 +12,6 @@ public class ExitAction extends Action {
 	_window = window;
 	setText("Exit \tCtrl+X");
 	setToolTipText("Exit Application");
-	// setImageDescriptor(greenImageDesc);
     }
 
     public void run() {
@@ -21,10 +20,10 @@ public class ExitAction extends Action {
 	saveDialogBox.setMessage("Save changes to file?");
 	saveDialogBox.setText("Save dialog");
 	int answer = saveDialogBox.open();
-	if (answer == 64) {// OK
+	if (answer == SWT.YES) {// OK
 	    System.out.println("OK is chosen");
 	    // TODO
-	} else if (answer == 128) {// CANCEL
+	} else if (answer == SWT.NO) {// CANCEL
 	    System.exit(0);
 	} else
 	    throw new IllegalArgumentException("Incorrect choise index (ExitAction.answer should be 64 or 128)");

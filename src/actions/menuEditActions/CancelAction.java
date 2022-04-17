@@ -11,7 +11,6 @@ public class CancelAction extends Action {
 	_window = window;
 	setText("Cancel \tCtrl+Q");
 	setToolTipText("Cancel");
-	// setImageDescriptor(greenImageDesc);
     }
 
     public void run() {

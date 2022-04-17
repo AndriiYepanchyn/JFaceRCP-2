@@ -12,7 +12,6 @@ public class HelpAction extends Action {
 	_window = window;
 	setText("Help \tF1");
 	setToolTipText("Help");
-	// setImageDescriptor(greenImageDesc);
     }
 
     public void run() {
@@ -21,7 +20,6 @@ public class HelpAction extends Action {
 	MessageBox helpMessageBox = new MessageBox(_window.getShell(), SWT.OK);
 	helpMessageBox.setMessage(helpString);
 	helpMessageBox.setText("Help dialog");
-	int answer = helpMessageBox.open();
-
+	helpMessageBox.open();
     }
 }

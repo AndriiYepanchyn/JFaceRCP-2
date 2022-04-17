@@ -1,6 +1,6 @@
 package savers;
 
-import static jface.SessionManager.getInstatnce;
+import static jface.SessionManager.getSession;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,9 +24,10 @@ public class FileReadManager {
 	window = inWindow;
 	String tempFileName = chooseFile();
 	if (tempFileName != null && !tempFileName.equals("")) {
-	    getInstatnce().fileName = tempFileName;
-	    Savable fileData = selectSaver(getInstatnce().fileName);
-	    getInstatnce().unsavedRecords = fileData.readFromFile(getInstatnce().fileName);
+	    Savable fileData = selectSaver(tempFileName);
+	    getSession().unsavedRecords = fileData.readFromFile(tempFileName);
+	    getSession().fileName = tempFileName;
+	    getSession().isNewFile = false;
 	}
     }
 

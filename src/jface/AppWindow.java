@@ -18,6 +18,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Rectangle;
@@ -59,17 +60,19 @@ public class AppWindow extends ApplicationWindow {
     Button buttonSave;
     Button buttonDelete;
     Button buttonCancel;
-    Session ses = SessionManager.getInstatnce();
+    Session session = SessionManager.getSession();
     Entity newEntity;
+
+    public boolean buttonNewStatus = false;
+    public boolean buttonSaveStatus = false;
+    public boolean buttonDeleteStatus = false;
+
+    private NewRowAction newRowAction = new NewRowAction(this, buttonNewStatus);
+    private SaveRowAction newSaveRowAction = new SaveRowAction(this, buttonSaveStatus);
+    private DeleteAction newDeleteAction = new DeleteAction(this, buttonDeleteStatus);
 
     public AppWindow() {
 	super(null);
-//	ses.addEntity("name 1", "1", true);
-//	ses.addEntity("name 2", "2", false);
-//	ses.addEntity("name 3", "1", true);
-//	ses.addEntity("name 4", "2", false);
-//	ses.addEntity("name 5", "1", false);
-//	ses.addEntity("name 6", "2", true);
 	addMenuBar();
     }
 
@@ -88,7 +91,7 @@ public class AppWindow extends ApplicationWindow {
 	getShell().setBounds(mSize);
 	getShell().setMinimumSize(xSize, ySize);
 	getShell().setMaximumSize(xSize + 400, ySize + 400);
-	getShell().setText("JFace application");
+	getShell().setText("JFace application:" + session.fileName);
     }
 
     @Override
@@ -118,9 +121,9 @@ public class AppWindow extends ApplicationWindow {
 	MenuManager menuEdit = new MenuManager("&Edit", "2");
 	mainMenu.add(menuEdit);
 
-	menuEdit.add(new NewRowAction(this));
-	menuEdit.add(new SaveRowAction(this));
-	menuEdit.add(new DeleteAction(this));
+	menuEdit.add(newRowAction);
+	menuEdit.add(newSaveRowAction);
+	menuEdit.add(newDeleteAction);
 	menuEdit.add(new CancelAction(this));
 //Help Menu
 	MenuManager menuHelp = new MenuManager("&About", "3");
@@ -138,63 +141,63 @@ public class AppWindow extends ApplicationWindow {
 	form.SASH_WIDTH = 1;
 
 	// Start create Left part
-	Composite child1 = new Composite(form, SWT.BORDER);
-	child1.setLayout(new FillLayout());
-	viewer = createTableViewer(child1);
+	Composite childLeft = new Composite(form, SWT.BORDER);
+	childLeft.setLayout(new FillLayout());
+	viewer = createTableViewer(childLeft);
 
 	// Start create right part
-	Composite child2 = new Composite(form, SWT.BORDER);
-	FillLayout fill2 = new FillLayout(SWT.VERTICAL);
-	child2.setLayout(fill2);
+	Composite childRight = new Composite(form, SWT.BORDER);
+	FillLayout fillLayoutRight = new FillLayout(SWT.VERTICAL);
+	childRight.setLayout(fillLayoutRight);
 
-	Composite child21 = createRightFieldArea(child2);
+	Composite childFieldsArea = createRightFieldArea(childRight);
 
 	// Labels
-	Label labelName = new Label(child21, SWT.NONE);
+	Label labelName = new Label(childFieldsArea, SWT.NONE);
 	labelName.setText("Name");
 	labelName.setLayoutData(createGridForLabel());
 
-	textName = new Text(child21, SWT.BORDER);
+	textName = new Text(childFieldsArea, SWT.BORDER);
 	textName.setLayoutData(createGridForText());
 	textName.addModifyListener(new ModifyListener() {
 	    @Override
 	    public void modifyText(ModifyEvent e) {
-		buttonSave.setEnabled(true);
-		buttonNew.setEnabled(true);
+		moidfyEventMethod();
 	    }
-	});
 
-	Label labelGroup = new Label(child21, SWT.NONE);
+	});
+	textName.addVerifyListener(AppWindow::ensureTextContainsOnlyTwoWordsWithSpaceAsDelimeter);
+
+	Label labelGroup = new Label(childFieldsArea, SWT.NONE);
 	labelGroup.setText("Group");
 	labelGroup.setLayoutData(createGridForLabel());
 
-	textGroup = new Text(child21, SWT.BORDER);
+	textGroup = new Text(childFieldsArea, SWT.BORDER);
 	textGroup.setLayoutData(createGridForText());
 	textGroup.addModifyListener(new ModifyListener() {
 	    @Override
 	    public void modifyText(ModifyEvent e) {
-		buttonSave.setEnabled(true);
-		buttonNew.setEnabled(true);
+		moidfyEventMethod();
 	    }
 	});
+	textGroup.addVerifyListener(AppWindow::ensureTextContainsOnlyDigits);
 
-	Label labelSWTDone = new Label(child21, SWT.NONE);
+	Label labelSWTDone = new Label(childFieldsArea, SWT.NONE);
 	labelSWTDone.setText("SWT task is done?");
 	labelSWTDone.setLayoutData(createGridForLabel());
 
-	buttonSWTDone = new Button(child21, SWT.CHECK);
+	buttonSWTDone = new Button(childFieldsArea, SWT.CHECK);
 	buttonSWTDone.setSelection(false);
 	buttonSWTDone.setLayoutData(createGridForText());
 	buttonSWTDone.addListener(SWT.Selection, new Listener() {
 	    @Override
 	    public void handleEvent(Event event) {
-		buttonSave.setEnabled(true);
-		buttonNew.setEnabled(true);
+		moidfyEventMethod();
 	    }
 	});
 
 	// Buttons
-	buttonNew = createButton(child21, "New", createGridForButtonNew());
+	buttonNew = createButton(childFieldsArea, "New", createGridForButtonNew());
 	buttonNew.addSelectionListener(new SelectionListener() {
 	    @Override
 	    public void widgetSelected(SelectionEvent e) {
@@ -206,7 +209,7 @@ public class AppWindow extends ApplicationWindow {
 	    }
 	});
 
-	buttonSave = createButton(child21, "Save", createGridForButton());
+	buttonSave = createButton(childFieldsArea, "Save", createGridForButton());
 	buttonSave.addSelectionListener(new SelectionListener() {
 	    @Override
 	    public void widgetSelected(SelectionEvent e) {
@@ -220,7 +223,7 @@ public class AppWindow extends ApplicationWindow {
 	    }
 	});
 
-	buttonDelete = createButton(child21, "Delete", createGridForButton());
+	buttonDelete = createButton(childFieldsArea, "Delete", createGridForButton());
 	buttonDelete.addSelectionListener(new SelectionListener() {
 	    @Override
 	    public void widgetSelected(SelectionEvent e) {
@@ -232,15 +235,14 @@ public class AppWindow extends ApplicationWindow {
 	    }
 	});
 
-	buttonCancel = createButton(child21, "Cancel", createGridForButton());
+	buttonCancel = createButton(childFieldsArea, "Cancel", createGridForButton());
 	buttonCancel.setEnabled(true);
 	buttonCancel.addSelectionListener(new SelectionListener() {
 	    @Override
 	    public void widgetSelected(SelectionEvent e) {
 		viewer.getTable().deselectAll();
 		clearFields();
-		buttonSave.setEnabled(false);
-		buttonNew.setEnabled(false);
+		changeMenuAndButtonsStatus(false, false, false);
 	    }
 
 	    @Override
@@ -251,6 +253,18 @@ public class AppWindow extends ApplicationWindow {
 	});
 
 	form.setWeights(new int[] { 70, 50 });
+    }
+
+    private static void ensureTextContainsOnlyTwoWordsWithSpaceAsDelimeter(VerifyEvent e) {
+	String currentChar = e.text;
+	String text = ((Text) e.widget).getText() + currentChar;
+	e.doit = text.matches("[a-zA-Zà-ÿÀ-ß³²¿¯ºª']+[ ]{0,1}[a-zA-Zà-ÿÀ-ß³²¿¯ºª']*");
+    }
+
+    private static void ensureTextContainsOnlyDigits(VerifyEvent e) {
+	String string = e.text;
+	e.doit = string.matches("\\d*");
+	return;
     }
 
     public static Composite createRightFieldArea(Composite parent) {
@@ -314,13 +328,13 @@ public class AppWindow extends ApplicationWindow {
 	TableViewer viewer = new TableViewer(parent, SWT.BORDER | SWT.FULL_SELECTION);
 	viewer.setContentProvider(ArrayContentProvider.getInstance());
 
-	String[] columnNameStrings = Entity.getArrayOfEntityFields();
-	for (String colName : columnNameStrings) {
+	String[] columnNames = Entity.getFieldsNames();
+	for (String colName : columnNames) {
 	    createColumnName(viewer, colName);
 	}
 
 	viewer.getTable().getColumn(2).setWidth(80);
-	viewer.setInput(ses.getAllRecords());
+	viewer.setInput(session.getAllRecords());
 	viewer.getTable().setSelection(0);
 	viewer.getTable().setLinesVisible(true);
 	viewer.getTable().setHeaderVisible(true);
@@ -330,14 +344,13 @@ public class AppWindow extends ApplicationWindow {
 	    @Override
 	    public void selectionChanged(SelectionChangedEvent event) {
 		IStructuredSelection selection = viewer.getStructuredSelection();
-		ses.activeRecord = (Entity) selection.getFirstElement();
-		ses.name = ses.activeRecord.getName();
-		ses.group = ses.activeRecord.getGroup();
-		ses.swtDone = ses.activeRecord.getSwtDone();
+		session.activeRecord = (Entity) selection.getFirstElement();
+		session.name = session.activeRecord.getName();
+		session.group = session.activeRecord.getGroup();
+		session.swtDone = session.activeRecord.getSwtDone();
 		setFields();
-		buttonNew.setEnabled(false);
-		buttonSave.setEnabled(false);
-		buttonDelete.setEnabled(true);
+
+		changeMenuAndButtonsStatus(false, false, true);
 	    }
 	});
 	return viewer;
@@ -378,66 +391,67 @@ public class AppWindow extends ApplicationWindow {
     }
 
     private void setFields() {
-	textName.setText(ses.name);
-	textGroup.setText(ses.group);
-	buttonSWTDone.setSelection(ses.swtDone);
+	textName.setText("");
+	textName.setText(session.name);
+	textGroup.setText(session.group);
+	buttonSWTDone.setSelection(session.swtDone);
 	redrawAll();
     }
 
     public void clearFields() {
-	ses.name = "";
-	ses.group = "";
-	ses.swtDone = false;
-	ses.activeRecord = null;
+	session.name = "";
+	session.group = "";
+	session.swtDone = false;
+	session.activeRecord = null;
 	setFields();
     }
 
     public void newRecordAction() {
 	ifNewTableStarted();
-	if (ses.activeRecord != null) {
-	    ses.name = textName.getText();
-	    ses.group = textGroup.getText();
-	    ses.swtDone = buttonSWTDone.getSelection();
-	    boolean answer = (ses.activeRecord.getName().equals(ses.name)
-		    && ses.activeRecord.getGroup().equals(ses.group) && ses.activeRecord.getSwtDone() == ses.swtDone);
+	if (session.activeRecord != null) {
+	    session.name = textName.getText();
+	    session.group = textGroup.getText();
+	    session.swtDone = buttonSWTDone.getSelection();
+	    boolean answer = (session.activeRecord.getName().equals(session.name)
+		    && session.activeRecord.getGroup().equals(session.group)
+		    && session.activeRecord.getSwtDone() == session.swtDone);
 	    if (!answer) {
-		ses.addEntity(ses.name, ses.group, ses.swtDone);
+		session.addEntity(session.name, session.group, session.swtDone);
 	    }
 	    viewer.refresh();
 	    viewer.getTable().deselectAll();
 	    clearFields();
-	    buttonSave.setEnabled(false);
-	    buttonNew.setEnabled(false);
+	    changeMenuAndButtonsStatus(false, false, false);
 	}
     }
 
     public void saveRowAction() {
 	ifNewTableStarted();
-	if (ses.activeRecord != null) {
-	    ses.name = textName.getText();
-	    ses.group = textGroup.getText();
-	    ses.swtDone = buttonSWTDone.getSelection();
-	    boolean answer = (ses.activeRecord.getName().equals(ses.name)
-		    && ses.activeRecord.getGroup().equals(ses.group) && ses.activeRecord.getSwtDone() == ses.swtDone);
-	    if (!answer) {
-		ses.activeRecord.setName(ses.name);
-		ses.activeRecord.setGroup(ses.group);
-		ses.activeRecord.setSwtDone(ses.swtDone);
-	    }
-	    viewer.getTable().deselectAll();
-	    clearFields();
-	    buttonSave.setEnabled(false);
-	    buttonNew.setEnabled(false);
+	if (session.activeRecord == null) {
+	    return;
 	}
+	session.name = textName.getText();
+	session.group = textGroup.getText();
+	session.swtDone = buttonSWTDone.getSelection();
+	boolean answer = (session.activeRecord.getName().equals(session.name)
+		&& session.activeRecord.getGroup().equals(session.group)
+		&& session.activeRecord.getSwtDone() == session.swtDone);
+	if (!answer) {
+	    session.activeRecord.setName(session.name);
+	    session.activeRecord.setGroup(session.group);
+	    session.activeRecord.setSwtDone(session.swtDone);
+	}
+	viewer.getTable().deselectAll();
+	clearFields();
+	changeMenuAndButtonsStatus(false, false, false);
     }
 
     public void deleteAction() {
-	ses.removeCurrentObject();
+	session.removeCurrentObject();
 	viewer.getTable().deselectAll();
 	setFields();
 	redrawAll();
-	buttonSave.setEnabled(false);
-	buttonNew.setEnabled(false);
+	changeMenuAndButtonsStatus(false, false, false);
     }
 
     public void redrawAll() {
@@ -448,23 +462,38 @@ public class AppWindow extends ApplicationWindow {
     }
 
     public void reassignTableInput() {
-	viewer.setInput(ses.unsavedRecords);
+	viewer.setInput(session.unsavedRecords);
     }
 
     public void clearSession() {
 	viewer.getTable().deselectAll();
-	ses.clear();
-	buttonSave.setEnabled(false);
-	buttonNew.setEnabled(false);
+	session.clear();
+	changeMenuAndButtonsStatus(false, false, false);
     }
 
     private void ifNewTableStarted() {
-	if (ses.unsavedRecords.size() == 0) {
+	if (session.unsavedRecords.size() == 0) {
 	    Entity newEntity = new Entity(textName.getText(), textGroup.getText(), buttonSWTDone.getSelection());
-	    ses.addEntity(newEntity);
-	    ses.activeRecord = ses.unsavedRecords.get(0);
+	    session.addEntity(newEntity);
+	    session.activeRecord = session.unsavedRecords.get(0);
 	    newEntity = null;
 	}
     }
 
+    private void moidfyEventMethod() {
+	if (session.activeRecord != null || session.unsavedRecords.size() == 0) {
+	    changeMenuAndButtonsStatus(true, true, true);
+	}
+    }
+
+    private void changeMenuAndButtonsStatus(boolean buttonNewStatus, boolean buttonSaveStatus,
+	    boolean buttonDeleteStatus) {
+	buttonNew.setEnabled(buttonNewStatus);
+	buttonSave.setEnabled(buttonSaveStatus);
+	buttonDelete.setEnabled(buttonDeleteStatus);
+
+	newRowAction.setEnabled(buttonNewStatus);
+	newSaveRowAction.setEnabled(buttonNewStatus);
+	newDeleteAction.setEnabled(buttonDeleteStatus);
+    }
 }

@@ -6,12 +6,14 @@ import jface.AppWindow;
 
 public class SaveRowAction extends Action {
     AppWindow _window;
+    boolean isActive;
 
-    public SaveRowAction(AppWindow window) {
-	_window = window;
-	setText("Save record \tCtrl+M");
-	setToolTipText("Save record");
-	// setImageDescriptor(greenImageDesc);
+    public SaveRowAction(AppWindow window, boolean status) {
+	this._window = window;
+	this.setText("Save record \tCtrl+M");
+	this.setToolTipText("Save record");
+	this.isActive = status;
+	this.setEnabled(isActive);
     }
 
     public void run() {

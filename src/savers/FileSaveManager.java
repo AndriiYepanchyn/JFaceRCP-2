@@ -1,6 +1,6 @@
 package savers;
 
-import static jface.SessionManager.getInstatnce;
+import static jface.SessionManager.getSession;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +10,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
 
 import jface.AppWindow;
+import jface.Session;
+import jface.SessionManager;
 
 public class FileSaveManager {
     private static final String[] FILTER_NAMES = { "JSON Files (*.json)", "Plain text (*.txt)", "All Files (*.*)" };
@@ -21,28 +23,28 @@ public class FileSaveManager {
 
     // SaveWithConfirmationOfFileName = true - ask file name in DialogBox, = false
     // use fileName saved in session
-    public static void execute(AppWindow inWindow, boolean SaveWithFileSelection) {
+    public static void execute(AppWindow inWindow, boolean isSaveAs) {
 
 	window = inWindow;
 	String tempFileName;
-	if (SaveWithFileSelection) {
+	Session session = SessionManager.getSession();
+	if (isSaveAs || session.isNewFile) {
 	    tempFileName = chooseFile();
 	} else {
-	    tempFileName = getInstatnce().fileName;
-	    if (!isFileNameCorrect(tempFileName)) {
-		FileSaveManager.execute(inWindow, true);
-	    }
+	    tempFileName = session.fileName;
 	}
+
 	if (isFileNameCorrect(tempFileName)) {
-	    getInstatnce().fileName = tempFileName;
-	    Savable fileData = selectSaver(getInstatnce().fileName);
-	    fileData.saveToFile(getInstatnce().unsavedRecords, getInstatnce().fileName);
+	    Savable fileData = selectSaver(tempFileName);
+	    fileData.saveToFile(getSession().unsavedRecords, tempFileName);
+	    getSession().fileName = tempFileName;
+	    getSession().isNewFile = false;
 	} else {
 	    // Errorbox
 	    MessageBox incorrectFileDialogBox = new MessageBox(window.getShell(), SWT.OK);
 	    incorrectFileDialogBox.setMessage("There wasn't correct file name entered");
 	    incorrectFileDialogBox.setText("WARNING! File wasn't saved");
-	    int answer = incorrectFileDialogBox.open();
+	    incorrectFileDialogBox.open();
 	}
     }
 
@@ -55,6 +57,7 @@ public class FileSaveManager {
 	if (fileName == null) {
 	    fileName = "";
 	}
+	System.out.println("Chosen file is: " + fileName);
 	return fileName;
     }
 
@@ -76,16 +79,15 @@ public class FileSaveManager {
 	if (fileName != null && fileName.length() > 0) {
 	    File f = new File(fileName);
 	    try {
-		if (f.exists() || (f.createNewFile()) && f.canWrite()) {
-		    return true;
-		} else
-		    return false;
+		return (f.exists() || (f.createNewFile()) && f.canWrite());
 	    } catch (IOException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
+		System.out.println("in exception checked = false");
 		return false;
 	    }
-	} else
+	} else {
+	    System.out.println("last fork = false");
 	    return false;
+	}
     }
 }

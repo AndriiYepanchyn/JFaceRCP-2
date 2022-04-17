@@ -6,22 +6,17 @@ import jface.AppWindow;
 
 public class DeleteAction extends Action {
     AppWindow _window;
-    // boolean isActive = true;
+    boolean isActive = true;
 
-    public DeleteAction(AppWindow window) {
+    public DeleteAction(AppWindow window, boolean status) {
 	_window = window;
 	setText("Delete record \tCtrl+D");
 	setToolTipText("Delete record");
-	// setImageDescriptor(greenImageDesc);
-	// isActive = (SessionManager.getInstatnce().activeRecord == null);
+	isActive = status;
+	this.setEnabled(isActive);
     }
 
     public void run() {
-//	if (isActive) {
-//	    this.setEnabled(false);
-//	} else {
-//	    this.setEnabled(true);
 	_window.deleteAction();
-//	}
     }
 }

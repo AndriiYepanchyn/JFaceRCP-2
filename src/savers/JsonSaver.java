@@ -28,7 +28,7 @@ public class JsonSaver implements Savable {
 	File myFile = new File(fileName);
 	try {
 	    @SuppressWarnings("resource")
-	    OutputStream fileStream = new FileOutputStream(myFile);
+	    OutputStream fileStream = new FileOutputStream(myFile, false);
 	    @SuppressWarnings("resource")
 	    Writer writer = new BufferedWriter(new OutputStreamWriter(fileStream));
 	    writer.write(outputString);
@@ -53,13 +53,13 @@ public class JsonSaver implements Savable {
 	    }
 	    reader.close();
 	    scanner.close();
-	} catch (IOException e) {
+	} catch (Exception e) {
 	    e.printStackTrace();
 	}
 
 	// Start convert JSON
 	ArrayList<Entity> answer = new ArrayList<>();
-	if (out != null && !out.equals("")) {
+	if (out != null && !out.toString().equals("")) {
 	    Gson gson = new Gson();
 	    Type type = new TypeToken<ArrayList<Entity>>() {
 	    }.getType();

@@ -6,12 +6,14 @@ import jface.AppWindow;
 
 public class NewRowAction extends Action {
     AppWindow _window;
+    boolean isActive;
 
-    public NewRowAction(AppWindow window) {
+    public NewRowAction(AppWindow window, boolean status) {
 	_window = window;
 	setText("New row \tCtrl+R");
 	setToolTipText("New row");
-	// setImageDescriptor(greenImageDesc);
+	isActive = status;
+	this.setEnabled(isActive);
     }
 
     public void run() {
