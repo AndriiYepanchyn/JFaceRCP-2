@@ -258,12 +258,12 @@ public class AppWindow extends ApplicationWindow {
     private static void ensureTextContainsOnlyTwoWordsWithSpaceAsDelimeter(VerifyEvent e) {
 	String currentChar = e.text;
 	String text = ((Text) e.widget).getText() + currentChar;
-	e.doit = text.matches("[a-zA-Zà-ÿÀ-ß³²¿¯ºª']+[ ]{0,1}[a-zA-Zà-ÿÀ-ß³²¿¯ºª']*");
+	e.doit = (text.matches("[a-zA-Zà-ÿÀ-ß³²¿¯ºª']+[ ]{0,1}[a-zA-Zà-ÿÀ-ß³²¿¯ºª']*") && text.length() > 0);
     }
 
     private static void ensureTextContainsOnlyDigits(VerifyEvent e) {
 	String string = e.text;
-	e.doit = string.matches("\\d*");
+	e.doit = (string.matches("\\d*"));
 	return;
     }
 
@@ -352,7 +352,6 @@ public class AppWindow extends ApplicationWindow {
 		    session.group = session.activeRecord.getGroup();
 		    session.swtDone = session.activeRecord.getSwtDone();
 		}
-		System.out.println(session.activeRecord);
 		setFields();
 		changeMenuAndButtonsStatus(false, false, true);
 	    }
@@ -487,7 +486,11 @@ public class AppWindow extends ApplicationWindow {
 
     private void moidfyEventMethod() {
 	if (session.activeRecord != null || session.unsavedRecords.size() == 0) {
-	    changeMenuAndButtonsStatus(true, true, true);
+	    if (textName.getText().length() > 0 && textGroup.getText().length() > 0) {
+		changeMenuAndButtonsStatus(true, true, true);
+	    } else if (textName.getText().length() == 0 || textGroup.getText().length() == 0) {
+		changeMenuAndButtonsStatus(false, false, true);
+	    }
 	}
     }
 

@@ -1,4 +1,4 @@
 
 git.exe add --all
-git.exe commit -m "Fix 1. Added cancel button in exit dialog, fixed bug which appeared then open empty file after not empty file"
+git.exe commit -m "Fix 2. impossible to push new or save button if Name or group is empty"
 git.exe push
