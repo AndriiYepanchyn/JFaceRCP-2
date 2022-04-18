@@ -65,7 +65,7 @@ public class JsonSaver implements Savable {
 	    }.getType();
 	    answer = gson.fromJson(out.toString(), type);
 	} else {
-	    answer = null;
+	    answer = new ArrayList<Entity>();
 	}
 	return answer;
     }

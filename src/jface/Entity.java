@@ -19,19 +19,35 @@ public class Entity {
     }
 
     public String getName() {
-	return name;
+	if (name == null) {
+	    return "";
+	} else {
+	    return name;
+	}
     }
 
     public void setName(String name) {
-	this.name = name;
+	if (name == null) {
+	    this.name = "";
+	} else {
+	    this.name = name;
+	}
     }
 
     public String getGroup() {
-	return group;
+	if (group == null) {
+	    return "";
+	} else {
+	    return group;
+	}
     }
 
     public void setGroup(String group) {
-	this.group = group;
+	if (group == null) {
+	    this.group = "";
+	} else {
+	    this.group = group;
+	}
     }
 
     public boolean getSwtDone() {

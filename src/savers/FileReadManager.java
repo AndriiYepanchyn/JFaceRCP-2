@@ -52,10 +52,8 @@ public class FileReadManager {
 	String extenstion = filename.substring(start + 1).toUpperCase();
 	switch (extenstion) {
 	case "JSON":
-	    // System.out.println("JSON TYPE Selected");
 	    return new JsonSaver();
 	case "TXT":
-	    // System.out.println("TXT type selected");
 	    return new TxtSaver();
 	default:
 	    System.out.println("Incorrect file type");

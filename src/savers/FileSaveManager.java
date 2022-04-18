@@ -15,14 +15,9 @@ import jface.SessionManager;
 
 public class FileSaveManager {
     private static final String[] FILTER_NAMES = { "JSON Files (*.json)", "Plain text (*.txt)", "All Files (*.*)" };
-
-    // These filter extensions are used to filter which files are displayed.
     private static final String[] FILTER_EXTS = { "*.json", "*.txt", "*.*" };
-
     private static AppWindow window;
 
-    // SaveWithConfirmationOfFileName = true - ask file name in DialogBox, = false
-    // use fileName saved in session
     public static void execute(AppWindow inWindow, boolean isSaveAs) {
 
 	window = inWindow;
@@ -57,7 +52,6 @@ public class FileSaveManager {
 	if (fileName == null) {
 	    fileName = "";
 	}
-	System.out.println("Chosen file is: " + fileName);
 	return fileName;
     }
 
@@ -82,11 +76,9 @@ public class FileSaveManager {
 		return (f.exists() || (f.createNewFile()) && f.canWrite());
 	    } catch (IOException e) {
 		e.printStackTrace();
-		System.out.println("in exception checked = false");
 		return false;
 	    }
 	} else {
-	    System.out.println("last fork = false");
 	    return false;
 	}
     }

@@ -33,9 +33,7 @@ public class SortedTableEditor {
 	    protected void doSetValue(Object element, Object value) {
 		((Entity) element).setName(value.toString());
 	    }
-
 	});
-
     }
 
     private TableViewerColumn createColumnFor(TableViewer viewer, String label) {

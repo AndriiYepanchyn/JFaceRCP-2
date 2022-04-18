@@ -53,7 +53,6 @@ public class TxtSaver implements Savable {
 	    e.printStackTrace();
 	}
 	return out;
-
     }
 
     private Entity additiveToOut(String tmp) {

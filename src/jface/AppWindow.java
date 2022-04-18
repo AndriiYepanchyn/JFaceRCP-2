@@ -345,11 +345,15 @@ public class AppWindow extends ApplicationWindow {
 	    public void selectionChanged(SelectionChangedEvent event) {
 		IStructuredSelection selection = viewer.getStructuredSelection();
 		session.activeRecord = (Entity) selection.getFirstElement();
-		session.name = session.activeRecord.getName();
-		session.group = session.activeRecord.getGroup();
-		session.swtDone = session.activeRecord.getSwtDone();
+		if (session.activeRecord == null) {
+		    clearFields();
+		} else {
+		    session.name = session.activeRecord.getName();
+		    session.group = session.activeRecord.getGroup();
+		    session.swtDone = session.activeRecord.getSwtDone();
+		}
+		System.out.println(session.activeRecord);
 		setFields();
-
 		changeMenuAndButtonsStatus(false, false, true);
 	    }
 	});
@@ -463,6 +467,7 @@ public class AppWindow extends ApplicationWindow {
 
     public void reassignTableInput() {
 	viewer.setInput(session.unsavedRecords);
+	viewer.getTable().deselectAll();
     }
 
     public void clearSession() {

@@ -16,6 +16,7 @@ public class OpenFileAction extends Action {
     }
 
     public void run() {
+	_window.clearFields();
 	FileReadManager.execute(_window);
 	_window.getShell().setText("JFace application:  " + SessionManager.getSession().fileName);
 	_window.reassignTableInput();
